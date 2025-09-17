@@ -1,49 +1,39 @@
-# NHS Notify Config
+# NHS Notify Supplier Config
 
-This repository contains code and schemas for NHS Notify configuration management, event publishing, and onboarding automation.
+This repository contains code and schemas for NHS Notify supplier configuration management and event publishing.
 
 ## Purpose
 
-- **Configuration Model:** Defines and manages client, campaign, quota, supplier, and routing configuration for NHS Notify.
-- **Event Schemas:** Publishes configuration changes as events to an event bus for consumption by other system components.
-- **Onboarding Automation:** Automates and streamlines the onboarding of new integrators, supporting self-serve and admin-driven workflows.
+- **Configuration Model:** Defines and manages supplier, quota, routing, and related configuration for NHS Notify
+  suppliers.
+- **Event Schemas:** Publishes configuration changes as events to an event bus for consumption by other system
+  components.
 
 ## Design
 
 ### Configuration Management
 
-A phased approach will be used to improve client configuration management:
+A phased approach will be used to improve supplier configuration management:
 
 1. **Libraries & Validation:** Standardise configuration and naming, reduce manual errors, and improve auditability.
-2. **API Layer:** Centralise access to configuration data.
-3. **Web UI:** Enable operations/admin teams to manage configuration with validation and audit trails.
+2. **API Layer:** Centralise access to supplier configuration data.
+3. **Web UI:** Enable operations/admin teams to manage supplier configuration with validation and audit trails.
 
 Configuration entities include:
 
-- `client`, `campaign`, `client_feature`, `client_quota`, `client_subscription`
-- `mesh_mailbox`, `apim_application`, `govuknotify_account`
-- `supplier_quota`, `channel_supplier`, `queue`, `suppression_filter`, `additional_mesh_report_subscription`
+- `supplier_quota`, `channel_supplier`, `queue`, `suppression_filter`, `govuknotify_account`
 
 Configuration changes are validated, auditable, and published to environments via an event bus.
 
 ### Event Publishing
 
-Configuration changes are published as events to a central event bus, enabling decoupled updates across bounded contexts (core, print supplier API, template/routing UI, user management, etc.).
+Configuration changes are published as events to a central event bus, enabling decoupled updates across bounded
+contexts (core, print supplier API, template/routing UI, user management, etc.).
 
 Event publishing strategies include:
 
 - CLI tools (tactical)
-- Scheduled audit tasks (tactical)
 - Admin/Web UI (strategic, single source of truth)
-
-### Onboarding Automation
-
-Quick Start onboarding will enable rapid, self-serve client setup in INT:
-
-- **Phase 1:** CLI/script automation using minimal data (client name, APIM ID, etc.)
-- **Phase 2:** Web UI for onboarding, protected by CIS2 auth, triggers config change events
-- **Phase 3:** Admin UI for incremental client config management and production promotion
-- **Phase 4:** Full self-serve onboarding via Web UI (admin approval for production)
 
 ## Usage
 
