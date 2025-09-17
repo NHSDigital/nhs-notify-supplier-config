@@ -2,7 +2,7 @@
   "dependencies": {
     "@nhsdigital/nhs-notify-supplier-config-schemas": "1.0.0",
     "csv-parse": "^5.6.0",
-    "zod": "^4.0.17"
+    "zod": "^4.1.9"
   },
   "devDependencies": {
     "@swc/core": "^1.11.13",
