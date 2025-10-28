@@ -6,7 +6,7 @@ import {
   $SpecificationStatus,
 } from "@nhsdigital/nhs-notify-schemas-supplier-config/src/domain/pack-specification";
 
-export const $SpecificationType = z.enum([
+export const $TemplateType = z.enum([
   "LETTER_STANDARD",
   "LETTER_BRAILLE",
   "LETTER_AUDIO",
@@ -17,7 +17,7 @@ export const $TemplateSpecification = ConfigBase("TemplateSpecification")
   .extend({
     name: z.string(),
     description: z.string().optional(),
-    specificationType: $SpecificationType,
+    templateType: $TemplateType,
     status: $SpecificationStatus,
     clientId: z.string().optional(),
     campaignIds: z.array(z.string()).optional(),

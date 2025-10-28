@@ -96,7 +96,7 @@ const specifications: Record<string, TemplateSpecification> = {
     name: "BAU Standard Letter",
     description: "BAU Standard Letter",
     packSpecificationIds: [bauStandardC5.id, bauStandardC4.id],
-    specificationType: "LETTER_STANDARD",
+    templateType: "LETTER_STANDARD",
     status: "PUBLISHED",
   },
   braille: {
@@ -104,7 +104,7 @@ const specifications: Record<string, TemplateSpecification> = {
     name: "Braille Letter",
     description: "Braille Letter",
     packSpecificationIds: [braille.id],
-    specificationType: "LETTER_BRAILLE",
+    templateType: "LETTER_BRAILLE",
     status: "PUBLISHED",
   },
   audio: {
@@ -112,7 +112,7 @@ const specifications: Record<string, TemplateSpecification> = {
     name: "Audio Letter",
     description: "Audio Letter",
     packSpecificationIds: [audio.id],
-    specificationType: "LETTER_AUDIO",
+    templateType: "LETTER_AUDIO",
     status: "PUBLISHED",
   },
   sameDay: {
@@ -120,7 +120,7 @@ const specifications: Record<string, TemplateSpecification> = {
     name: "Same Day Letter",
     description: "Same Day Letter",
     packSpecificationIds: [sameDay.id],
-    specificationType: "LETTER_SAME_DAY",
+    templateType: "LETTER_SAME_DAY",
     status: "PUBLISHED",
   },
   digitrials1: {
@@ -128,7 +128,7 @@ const specifications: Record<string, TemplateSpecification> = {
     name: "Digitrials Letter Specification 1",
     description: "Digitrials Letter Pack 1",
     packSpecificationIds: [digitrials1.id],
-    specificationType: "LETTER_STANDARD",
+    templateType: "LETTER_STANDARD",
     status: "PUBLISHED",
     clientId: "digitrials",
     campaignIds: ["digitrials-campaign-1"],
