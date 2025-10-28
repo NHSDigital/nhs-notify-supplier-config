@@ -1,11 +1,11 @@
-import { $Specification, EnvelopeId, Specification, SpecificationId } from '../specification';
+import { $Pack, EnvelopeId, Pack, PackId } from '../pack';
 import { $Version } from '../common';
 import { LayoutId } from '../layout';
 
 describe('Specification schema validation', () => {
 
-  const standardLetterSpecification: Specification = {
-    id: 'standard-letter' as SpecificationId,
+  const standardLetterSpecification: Pack = {
+    id: 'standard-letter' as PackId,
     name: 'Standard Economy-class Letter',
     status: 'PUBLISHED',
     createdAt: new Date(),
@@ -26,11 +26,11 @@ describe('Specification schema validation', () => {
   };
 
   it('should validate a standard letter specification', () => {
-    expect(() => $Specification.strict().parse(standardLetterSpecification)).not.toThrow();
+    expect(() => $Pack.strict().parse(standardLetterSpecification)).not.toThrow();
   });
 
   it('should accept a letter specification with unrecognised fields', () => {
-    expect(() => $Specification.parse({
+    expect(() => $Pack.parse({
       ...standardLetterSpecification,
       additionalField: { some: 'data' }
     })).not.toThrow();

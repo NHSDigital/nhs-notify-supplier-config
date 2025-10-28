@@ -11,7 +11,7 @@ export const $SpecificationType = z.enum([
   "LETTER_AUDIO",
   "LETTER_SAME_DAY",
 ]);
-export const $SpecificationFeature = z.enum(["MAILMARK"]);
+export const $PackFeature = z.enum(["MAILMARK", "BRAILLE", "AUDIO", "ADMAIL"]);
 export const $EnvelopeFeature = z.enum([
   "WHITEMAIL",
   "NHS_BRANDING",
@@ -40,11 +40,10 @@ export const $Insert = ConfigBase("Insert")
 export type Insert = z.infer<typeof $Insert>;
 export type InsertId = Insert["id"];
 
-export const $Specification = ConfigBase("Specification")
+export const $Pack = ConfigBase("Specification")
   .extend({
     name: z.string(),
     status: $SpecificationStatus,
-    specificationType: $SpecificationType,
     createdAt: z.date(),
     updatedAt: z.date(),
     version: $Version,
@@ -66,23 +65,23 @@ export const $Specification = ConfigBase("Specification")
       })
       .partial()
       .optional(),
-    pack: z
+    assembly: z
       .object({
         envelopeId: idRef($Envelope),
         printColour: z.enum(["BLACK", "COLOUR"]),
         paperColour: z.string().optional(),
         insert: idRef($Insert).optional(),
-        features: z.array($SpecificationFeature).optional(),
+        features: z.array($PackFeature).optional(),
         additional: z.record(z.string(), z.string()).optional(),
       })
       .partial()
       .optional(),
   })
   .describe("Specification");
-export type Specification = z.infer<typeof $Specification>;
-export const SpecificationId = $Specification.shape.id.parse;
+export type Pack = z.infer<typeof $Pack>;
+export const PackId = $Pack.shape.id.parse;
 
-export const $SpecificationGroup = ConfigBase("SpecificationGroup")
+export const $Specification = ConfigBase("Specification")
   .extend({
     name: z.string(),
     description: z.string().optional(),
@@ -90,8 +89,8 @@ export const $SpecificationGroup = ConfigBase("SpecificationGroup")
     status: $SpecificationStatus,
     clientId: z.string().optional(),
     campaignIds: z.array(z.string()).optional(),
-    specificationIds: z.array(idRef($Specification)).nonempty(),
+    packIds: z.array(idRef($Pack)).nonempty(),
   })
-  .describe("SpecificationGroup");
-export type SpecificationGroup = z.infer<typeof $SpecificationGroup>;
-export const SpecificaitonGroupId = $SpecificationGroup.shape.id.parse;
+  .describe("Specification");
+export type Specification = z.infer<typeof $Specification>;
+export const SpecificaitonId = $Specification.shape.id.parse;

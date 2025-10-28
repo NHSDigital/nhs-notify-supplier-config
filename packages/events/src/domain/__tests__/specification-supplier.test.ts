@@ -1,11 +1,11 @@
 import { $Version } from '../common';
 import { $SpecificationSupplier, SpecificationSupplier } from '../specification-supplier';
-import { EnvelopeId, Specification } from '../specification';
+import { EnvelopeId, Pack } from '../pack';
 import { LayoutId } from '../layout';
 
 describe('SpecificationSupplier schema validation', () => {
 
-  const standardLetterSpecification: Specification = {
+  const standardLetterSpecification: Pack = {
     id: 'standard-letter' as any,
     name: 'Standard Economy-class Letter',
     status: 'PUBLISHED',
