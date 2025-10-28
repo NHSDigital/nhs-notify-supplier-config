@@ -1,7 +1,7 @@
 import { z } from "zod";
-import idRef from "@nhsdigital/nhs-notify-schemas-supplier-config/src/helpers/id-ref";
+import { idRef } from "@nhsdigital/nhs-notify-schemas-supplier-config/src/helpers/id-ref";
 import { $ChannelSupplier } from "@nhsdigital/nhs-notify-schemas-supplier-config/src/domain/channel-supplier";
-import { $PackSpecification } from "src/domain/packSpecification";
+import { $PackSpecification } from "@nhsdigital/nhs-notify-schemas-supplier-config/src/domain/pack-specification";
 import { ConfigBase } from "@nhsdigital/nhs-notify-schemas-supplier-config/src/domain/common";
 
 export const $SpecificationSupplier = ConfigBase("SpecificationSupplier")

@@ -1,23 +1,17 @@
-import {z} from "zod";
+import { z } from "zod";
 import {
   $Version,
   ConfigBase,
 } from "@nhsdigital/nhs-notify-schemas-supplier-config/src/domain/common";
-import idRef from "@nhsdigital/nhs-notify-schemas-supplier-config/src/helpers/id-ref";
+import { idRef } from "@nhsdigital/nhs-notify-schemas-supplier-config/src/helpers/id-ref";
 
-export const $SpecificationType = z.enum([
-  "LETTER_STANDARD",
-  "LETTER_BRAILLE",
-  "LETTER_AUDIO",
-  "LETTER_SAME_DAY",
-]);
 export const $PackFeature = z.enum(["MAILMARK", "BRAILLE", "AUDIO", "ADMAIL"]);
 export const $EnvelopeFeature = z.enum([
   "WHITEMAIL",
   "NHS_BRANDING",
   "NHS_BARCODE",
 ]);
-const $SpecificationStatus = z.enum(["DRAFT", "PUBLISHED", "DISABLED"]);
+export const $SpecificationStatus = z.enum(["DRAFT", "PUBLISHED", "DISABLED"]);
 
 export const $Envelope = ConfigBase("Envelope")
   .extend({
@@ -40,7 +34,7 @@ export const $Insert = ConfigBase("Insert")
 export type Insert = z.infer<typeof $Insert>;
 export type InsertId = Insert["id"];
 
-export const $Pack = ConfigBase("Specification")
+export const $PackSpecification = ConfigBase("PackSpecification")
   .extend({
     name: z.string(),
     status: $SpecificationStatus,
@@ -77,20 +71,6 @@ export const $Pack = ConfigBase("Specification")
       .partial()
       .optional(),
   })
-  .describe("Specification");
-export type Pack = z.infer<typeof $Pack>;
-export const PackId = $Pack.shape.id.parse;
-
-export const $Specification = ConfigBase("Specification")
-  .extend({
-    name: z.string(),
-    description: z.string().optional(),
-    specificationType: $SpecificationType,
-    status: $SpecificationStatus,
-    clientId: z.string().optional(),
-    campaignIds: z.array(z.string()).optional(),
-    packIds: z.array(idRef($Pack)).nonempty(),
-  })
-  .describe("Specification");
-export type Specification = z.infer<typeof $Specification>;
-export const SpecificaitonId = $Specification.shape.id.parse;
+  .describe("PackSpecification");
+export type PackSpecification = z.infer<typeof $PackSpecification>;
+export const PackSpecificationId = $PackSpecification.shape.id.parse;

@@ -1,14 +1,16 @@
 import {
-  EnvelopeId,
-  Pack,
-  PackId,
-  SpecificaitonId,
-  Specification,
-} from "@nhsdigital/nhs-notify-schemas-supplier-config/src/domain/specification";
+  TemplateSpecificaitonId,
+  TemplateSpecification,
+} from "@nhsdigital/nhs-notify-schemas-supplier-config/src/domain/template-specification";
 import { Version } from "@nhsdigital/nhs-notify-schemas-supplier-config/src/domain/common";
+import {
+  EnvelopeId,
+  PackSpecification,
+  PackSpecificationId,
+} from "@nhsdigital/nhs-notify-schemas-supplier-config/src/domain/pack-specification";
 
-const bauStandardC5: Pack = {
-  id: PackId("bau-standard-c5"),
+const bauStandardC5: PackSpecification = {
+  id: PackSpecificationId("bau-standard-c5"),
   name: "BAU Standard Letter C5",
   status: "PUBLISHED",
   version: Version("1.0.0"),
@@ -19,8 +21,8 @@ const bauStandardC5: Pack = {
   },
 };
 
-const bauStandardC4: Pack = {
-  id: PackId("bau-standard-c4"),
+const bauStandardC4: PackSpecification = {
+  id: PackSpecificationId("bau-standard-c4"),
   name: "BAU Standard Letter C4",
   status: "PUBLISHED",
   version: Version("1.0.0"),
@@ -31,8 +33,8 @@ const bauStandardC4: Pack = {
   },
 };
 
-const braille: Pack = {
-  id: PackId("braille"),
+const braille: PackSpecification = {
+  id: PackSpecificationId("braille"),
   name: "Braille Letter",
   status: "PUBLISHED",
   version: Version("1.0.0"),
@@ -43,8 +45,8 @@ const braille: Pack = {
   },
 };
 
-const audio: Pack = {
-  id: PackId("audio"),
+const audio: PackSpecification = {
+  id: PackSpecificationId("audio"),
   name: "Audio Letter",
   status: "PUBLISHED",
   version: Version("1.0.0"),
@@ -55,8 +57,8 @@ const audio: Pack = {
   },
 };
 
-const sameDay: Pack = {
-  id: PackId("same-day"),
+const sameDay: PackSpecification = {
+  id: PackSpecificationId("same-day"),
   name: "Same Day Letter",
   status: "PUBLISHED",
   version: Version("1.0.0"),
@@ -67,8 +69,8 @@ const sameDay: Pack = {
   },
 };
 
-const digitrials1: Pack = {
-  id: PackId("digitrials1"),
+const digitrials1: PackSpecification = {
+  id: PackSpecificationId("digitrials1"),
   name: "Digitrials Letter Pack 1",
   status: "PUBLISHED",
   version: Version("1.0.0"),
@@ -88,44 +90,44 @@ const packs = {
   sameDay,
 };
 
-const specifications: Record<string, Specification> = {
+const specifications: Record<string, TemplateSpecification> = {
   bauStandard: {
-    id: SpecificaitonId("bau-standard"),
+    id: TemplateSpecificaitonId("bau-standard"),
     name: "BAU Standard Letter",
     description: "BAU Standard Letter",
-    packIds: [bauStandardC5.id, bauStandardC4.id],
+    packSpecificationIds: [bauStandardC5.id, bauStandardC4.id],
     specificationType: "LETTER_STANDARD",
     status: "PUBLISHED",
   },
   braille: {
-    id: SpecificaitonId("braille"),
+    id: TemplateSpecificaitonId("braille"),
     name: "Braille Letter",
     description: "Braille Letter",
-    packIds: [braille.id],
+    packSpecificationIds: [braille.id],
     specificationType: "LETTER_BRAILLE",
     status: "PUBLISHED",
   },
   audio: {
-    id: SpecificaitonId("audio"),
+    id: TemplateSpecificaitonId("audio"),
     name: "Audio Letter",
     description: "Audio Letter",
-    packIds: [audio.id],
+    packSpecificationIds: [audio.id],
     specificationType: "LETTER_AUDIO",
     status: "PUBLISHED",
   },
   sameDay: {
-    id: SpecificaitonId("same-day"),
+    id: TemplateSpecificaitonId("same-day"),
     name: "Same Day Letter",
     description: "Same Day Letter",
-    packIds: [sameDay.id],
+    packSpecificationIds: [sameDay.id],
     specificationType: "LETTER_SAME_DAY",
     status: "PUBLISHED",
   },
   digitrials1: {
-    id: SpecificaitonId("digitrials1"),
+    id: TemplateSpecificaitonId("digitrials1"),
     name: "Digitrials Letter Specification 1",
     description: "Digitrials Letter Pack 1",
-    packIds: [digitrials1.id],
+    packSpecificationIds: [digitrials1.id],
     specificationType: "LETTER_STANDARD",
     status: "PUBLISHED",
     clientId: "digitrials",

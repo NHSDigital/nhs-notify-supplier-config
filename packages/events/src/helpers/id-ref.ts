@@ -1,4 +1,4 @@
-import {z} from "zod";
+import { z } from "zod";
 
 /**
  * Creates a field that references another entity by ID, inferring the type from the referenced
@@ -21,11 +21,25 @@ import {z} from "zod";
  *   customerId: idRef(CustomerSchema), // Inferred as ZodString
  * });
  */
-function idRef<
+// Overload for when a specific ID field is provided
+export function idRef<
   T extends z.ZodObject<Record<string, z.ZodTypeAny>>,
-  K extends keyof z.infer<T> & string = "id",
+  K extends keyof T["shape"] & string,
+>(schema: T, idFieldName: K, entityName?: string): T["shape"][K];
+
+// Overload for when using the default "id" field
+export function idRef<
+  T extends z.ZodObject<Record<string, z.ZodTypeAny>> & {
+    shape: { id: z.ZodTypeAny };
+  },
+>(schema: T, idFieldName?: undefined, entityName?: string): T["shape"]["id"];
+
+// Implementation
+export function idRef<
+  T extends z.ZodObject<Record<string, z.ZodTypeAny>>,
+  K extends keyof T["shape"] & string = "id",
 >(schema: T, idFieldName?: K, entityName?: string): T["shape"][K] {
-  const {shape} = schema;
+  const { shape } = schema;
   const field = idFieldName ?? "id";
 
   if (!(field in shape)) {
@@ -42,12 +56,10 @@ function idRef<
   const targetEntityName = entityName || schema.description || "Unknown";
 
   // Create a new schema with the same type and validation as the ID field
-  const resultSchema = idFieldSchema.clone();
-
-  // Add metadata to indicate this is an ID reference
-  (resultSchema as any).__idRef = targetEntityName;
+  const resultSchema = idFieldSchema.clone().meta({
+    title: `${targetEntityName} ID Reference`,
+    description: `Reference to a ${targetEntityName} by its unique identifier`,
+  });
 
   return resultSchema as T["shape"][K];
 }
-
-export default idRef;

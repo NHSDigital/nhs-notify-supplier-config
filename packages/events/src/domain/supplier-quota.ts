@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ConfigBase } from "@nhsdigital/nhs-notify-schemas-supplier-config/src/domain/common";
-import idRef from "@nhsdigital/nhs-notify-schemas-supplier-config/src/helpers/id-ref";
+import { idRef } from "@nhsdigital/nhs-notify-schemas-supplier-config/src/helpers/id-ref";
 import { $ChannelSupplier } from "@nhsdigital/nhs-notify-schemas-supplier-config/src/domain/channel-supplier";
 
 export const $DayOfWeek = z.enum([
