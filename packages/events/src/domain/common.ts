@@ -10,4 +10,4 @@ export const $Version = z
   .string()
   .regex(/^\d+\.\d+\.\d+$/)
   .brand("Version");
-export type Version = z.infer<typeof $Version>;
+export const Version = $Version.parse;

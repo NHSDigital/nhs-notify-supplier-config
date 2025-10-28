@@ -1,22 +1,23 @@
-import { z } from "zod";
+import {z} from "zod";
 import {
   $Version,
   ConfigBase,
 } from "@nhsdigital/nhs-notify-schemas-supplier-config/src/domain/common";
 import idRef from "@nhsdigital/nhs-notify-schemas-supplier-config/src/helpers/id-ref";
-import { $Layout } from "@nhsdigital/nhs-notify-schemas-supplier-config/src/domain/layout";
 
-export const $SpecificationFeature = z.enum([
-  "SAME_DAY",
-  "BRAILLE",
-  "AUDIO_CD",
-  "MAILMARK",
+export const $SpecificationType = z.enum([
+  "LETTER_STANDARD",
+  "LETTER_BRAILLE",
+  "LETTER_AUDIO",
+  "LETTER_SAME_DAY",
 ]);
+export const $SpecificationFeature = z.enum(["MAILMARK"]);
 export const $EnvelopeFeature = z.enum([
   "WHITEMAIL",
   "NHS_BRANDING",
   "NHS_BARCODE",
 ]);
+const $SpecificationStatus = z.enum(["DRAFT", "PUBLISHED", "DISABLED"]);
 
 export const $Envelope = ConfigBase("Envelope")
   .extend({
@@ -26,7 +27,7 @@ export const $Envelope = ConfigBase("Envelope")
   })
   .describe("Envelope");
 export type Envelope = z.infer<typeof $Envelope>;
-export type EnvelopeId = Envelope["id"];
+export const EnvelopeId = $Envelope.shape.id.parse;
 
 export const $Insert = ConfigBase("Insert")
   .extend({
@@ -42,11 +43,11 @@ export type InsertId = Insert["id"];
 export const $Specification = ConfigBase("Specification")
   .extend({
     name: z.string(),
-    status: z.enum(["DRAFT", "PUBLISHED", "DISABLED"]),
+    status: $SpecificationStatus,
+    specificationType: $SpecificationType,
     createdAt: z.date(),
     updatedAt: z.date(),
     version: $Version,
-    layout: idRef($Layout),
     billing: z
       .object({
         basePrice: z.number(),
@@ -54,32 +55,43 @@ export const $Specification = ConfigBase("Specification")
       })
       .partial()
       .optional(),
-    postage: z.object({
-      tariff: z.string(),
-      size: z.string(),
-      deliverySLA: z.number(),
-      maxSheets: z.number(),
-      maxWeight: z.number().optional(),
-      maxThickness: z.number().optional(),
-    }),
-    pack: z.object({
-      envelope: idRef($Envelope),
-      printColour: z.enum(["BLACK", "COLOUR"]),
-      paperColour: z.string().optional(),
-      insert: idRef($Insert).optional(),
-      features: z.array($SpecificationFeature).optional(),
-      additional: z.record(z.string(), z.string()).optional(),
-    }),
+    postage: z
+      .object({
+        tariff: z.string(),
+        size: z.string(),
+        deliverySLA: z.number(),
+        maxSheets: z.number(),
+        maxWeight: z.number().optional(),
+        maxThickness: z.number().optional(),
+      })
+      .partial()
+      .optional(),
+    pack: z
+      .object({
+        envelopeId: idRef($Envelope),
+        printColour: z.enum(["BLACK", "COLOUR"]),
+        paperColour: z.string().optional(),
+        insert: idRef($Insert).optional(),
+        features: z.array($SpecificationFeature).optional(),
+        additional: z.record(z.string(), z.string()).optional(),
+      })
+      .partial()
+      .optional(),
   })
   .describe("Specification");
 export type Specification = z.infer<typeof $Specification>;
-export type SpecificationId = Specification["id"];
+export const SpecificationId = $Specification.shape.id.parse;
 
 export const $SpecificationGroup = ConfigBase("SpecificationGroup")
   .extend({
     name: z.string(),
     description: z.string().optional(),
-    specifications: z.array(idRef($Specification)).nonempty(),
+    specificationType: $SpecificationType,
+    status: $SpecificationStatus,
+    clientId: z.string().optional(),
+    campaignIds: z.array(z.string()).optional(),
+    specificationIds: z.array(idRef($Specification)).nonempty(),
   })
   .describe("SpecificationGroup");
 export type SpecificationGroup = z.infer<typeof $SpecificationGroup>;
+export const SpecificaitonGroupId = $SpecificationGroup.shape.id.parse;
