@@ -1,4 +1,4 @@
-import { z } from "zod";
+import {z} from "zod";
 
 /**
  * Creates a field that references another entity by ID, inferring the type from the referenced
@@ -21,11 +21,11 @@ import { z } from "zod";
  *   customerId: idRef(CustomerSchema), // Inferred as ZodString
  * });
  */
-export function idRef<
+function idRef<
   T extends z.ZodObject<Record<string, z.ZodTypeAny>>,
   K extends keyof z.infer<T> & string = "id",
 >(schema: T, idFieldName?: K, entityName?: string): T["shape"][K] {
-  const { shape } = schema;
+  const {shape} = schema;
   const field = idFieldName ?? "id";
 
   if (!(field in shape)) {
@@ -49,3 +49,5 @@ export function idRef<
 
   return resultSchema as T["shape"][K];
 }
+
+export default idRef;

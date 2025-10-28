@@ -1,8 +1,8 @@
-import { z } from 'zod';
-import * as fs from 'node:fs';
-import packageJson from '../../package.json';
+import { z } from "zod";
+import * as fs from "node:fs";
+import packageJson from "@nhsdigital/nhs-notify-schemas-supplier-config/package.json";
 
-const version = packageJson.version;
+const { version } = packageJson;
 
 for (const [key, schema] of Object.entries({
   // 'client-changed': $ClientChangedEvent

@@ -7,7 +7,7 @@ const config: Config = {
   moduleFileExtensions: ["ts", "js", "json", "node"],
   moduleNameMapper: {
     "@nhsdigital/nhs-notify-supplier-config-schemas$":
-      "<rootDir>/../../packages/schemas/src",
+      "<rootDir>/../../packages/events/src",
   },
 };
 
