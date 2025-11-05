@@ -6,8 +6,8 @@ export function ConfigBase<T extends string>(type: T) {
   });
 }
 
-export const $Version = z
+export const $Semver = z
   .string()
   .regex(/^\d+\.\d+\.\d+$/)
   .brand("Version");
-export const Version = $Version.parse;
+export const Version = $Semver.parse;

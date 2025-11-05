@@ -1,0 +1,57 @@
+{
+  "description": "LetterVariant",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "STANDARD",
+        "BRAILLE",
+        "AUDIO",
+        "SAME_DAY"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "DRAFT",
+        "PUBLISHED",
+        "DISABLED"
+      ]
+    },
+    "clientId": {
+      "type": "string"
+    },
+    "campaignIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "packSpecificationIds": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "title": "PackSpecification ID Reference",
+        "description": "Reference to a PackSpecification by its unique identifier",
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "type",
+    "status",
+    "packSpecificationIds"
+  ]
+}

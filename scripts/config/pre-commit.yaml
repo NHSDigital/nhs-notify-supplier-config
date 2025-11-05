@@ -9,10 +9,19 @@ repos:
       - id: check-symlinks
       - id: detect-private-key
       - id: end-of-file-fixer
+        exclude: |
+          (?x)^(
+            packages/events/.*/.*\.schema\.json
+          )$
       - id: forbid-new-submodules
       - id: mixed-line-ending
       - id: pretty-format-json
         args: ['--autofix']
+        exclude: |
+          (?x)^(
+              package(-lock)?\.json$ |
+              packages/events/.*/.*\.schema\.json
+          )$
     # -   id: ...
   - repo: local
     hooks:

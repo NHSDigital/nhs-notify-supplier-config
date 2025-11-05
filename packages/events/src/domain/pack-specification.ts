@@ -1,8 +1,5 @@
 import { z } from "zod";
-import {
-  $Version,
-  ConfigBase,
-} from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/common";
+import { ConfigBase } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/common";
 import { idRef } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/helpers/id-ref";
 
 export const $PackFeature = z.enum(["MAILMARK", "BRAILLE", "AUDIO", "ADMAIL"]);
@@ -37,9 +34,9 @@ export const $PackSpecification = ConfigBase("PackSpecification")
   .extend({
     name: z.string(),
     status: z.enum(["DRAFT", "PUBLISHED", "DISABLED"]),
-    createdAt: z.date(),
-    updatedAt: z.date(),
-    version: $Version,
+    createdAt: z.iso.datetime(),
+    updatedAt: z.iso.datetime(),
+    version: z.int(),
     billing: z
       .object({
         basePrice: z.number(),

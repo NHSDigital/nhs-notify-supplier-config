@@ -1,0 +1,120 @@
+{
+  "description": "PackSpecification",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "DRAFT",
+        "PUBLISHED",
+        "DISABLED"
+      ]
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991
+    },
+    "billing": {
+      "type": "object",
+      "properties": {
+        "basePrice": {
+          "type": "number"
+        },
+        "unitPrice": {
+          "type": "number"
+        }
+      }
+    },
+    "postage": {
+      "type": "object",
+      "properties": {
+        "tariff": {
+          "type": "string"
+        },
+        "size": {
+          "type": "string"
+        },
+        "deliverySLA": {
+          "type": "number"
+        },
+        "maxSheets": {
+          "type": "number"
+        },
+        "maxWeight": {
+          "type": "number"
+        },
+        "maxThickness": {
+          "type": "number"
+        }
+      }
+    },
+    "assembly": {
+      "type": "object",
+      "properties": {
+        "envelopeId": {
+          "title": "Envelope ID Reference",
+          "description": "Reference to a Envelope by its unique identifier",
+          "type": "string"
+        },
+        "printColour": {
+          "type": "string",
+          "enum": [
+            "BLACK",
+            "COLOUR"
+          ]
+        },
+        "paperColour": {
+          "type": "string"
+        },
+        "insert": {
+          "title": "Insert ID Reference",
+          "description": "Reference to a Insert by its unique identifier",
+          "type": "string"
+        },
+        "features": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "MAILMARK",
+              "BRAILLE",
+              "AUDIO",
+              "ADMAIL"
+            ]
+          }
+        },
+        "additional": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "status",
+    "createdAt",
+    "updatedAt",
+    "version"
+  ]
+}

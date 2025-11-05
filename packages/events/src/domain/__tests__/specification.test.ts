@@ -4,16 +4,15 @@ import {
   PackSpecification,
   PackSpecificationId,
 } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/pack-specification";
-import { $Version } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/common";
 
 describe("Specification schema validation", () => {
   const standardLetterSpecification: PackSpecification = {
     id: PackSpecificationId("standard-letter"),
     name: "Standard Economy-class Letter",
     status: "PUBLISHED",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    version: $Version.parse("1.0.0"),
+    createdAt: "2023-01-01T00:00:00Z",
+    updatedAt: "2023-01-01T00:00:00Z",
+    version: 1,
     postage: {
       tariff: "economy",
       size: "letter",

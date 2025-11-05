@@ -17,6 +17,7 @@ Gitleaks
 Grype
 idempotence
 Jira
+npm
 OAuth
 Octokit
 [Oo]nboarding
