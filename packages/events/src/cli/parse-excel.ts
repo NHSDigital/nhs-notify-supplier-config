@@ -3,11 +3,13 @@ import * as XLSX from "xlsx";
 import * as fs from "node:fs";
 import path from "node:path";
 import {
+  $PackSpecification,
   EnvelopeId,
   PackSpecification,
   PackSpecificationId,
 } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/pack-specification";
 import {
+  $LetterVariant,
   LetterVariant,
   LetterVariantId,
 } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/letter-variant";
@@ -101,7 +103,14 @@ function parsePackSpecification(row: PackSpecificationRow): PackSpecification {
     pack.assembly = assembly;
   }
 
-  return pack;
+  // Validate against Zod schema
+  try {
+    return $PackSpecification.parse(pack);
+  } catch (error) {
+    throw new Error(
+      `Validation failed for PackSpecification with id "${row.id}": ${error}`,
+    );
+  }
 }
 
 /**
@@ -127,7 +136,14 @@ function parseLetterVariant(row: LetterVariantRow): LetterVariant {
     variant.campaignIds = parseArray(row.campaignIds);
   }
 
-  return variant;
+  // Validate against Zod schema
+  try {
+    return $LetterVariant.parse(variant);
+  } catch (error) {
+    throw new Error(
+      `Validation failed for LetterVariant with id "${row.id}": ${error}`,
+    );
+  }
 }
 
 /**

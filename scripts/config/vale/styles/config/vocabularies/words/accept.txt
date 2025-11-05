@@ -6,6 +6,7 @@ bot
 [Cc]onfig
 Cognito
 Cyber
+datetime
 Dependabot
 draw.io
 drawio
@@ -29,3 +30,4 @@ Syft
 Terraform
 toolchain
 Trufflehog
+Zod

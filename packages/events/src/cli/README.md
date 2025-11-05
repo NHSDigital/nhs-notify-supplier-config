@@ -2,7 +2,7 @@
 
 ## parse-excel.ts
 
-Parse an Excel file containing PackSpecification and LetterVariant sheets and convert them to domain objects.
+Parse an Excel file containing PackSpecification and LetterVariant sheets and convert them to domain objects. All parsed objects are validated against their respective Zod schemas to ensure data integrity.
 
 ### Usage
 
@@ -99,6 +99,18 @@ The script generates a JSON file with the following structure:
 }
 ```
 
+### Validation
+
+The parser validates all parsed objects against their Zod schemas (`$PackSpecification` and `$LetterVariant`). If validation fails, the script will throw an error with details about which field failed validation and why.
+
+Example validation errors:
+
+- Invalid status values (must be "DRAFT", "PUBLISHED", or "DISABLED")
+- Invalid type values for LetterVariant (must be "STANDARD", "BRAILLE", "AUDIO", or "SAME_DAY")
+- Missing required fields
+- Invalid data types (e.g., string instead of integer for version)
+- Invalid ISO datetime format for createdAt/updatedAt
+
 ### Programmatic Usage
 
 You can also import and use the parser in your own code:
@@ -106,7 +118,11 @@ You can also import and use the parser in your own code:
 ```typescript
 import parseExcelFile from "./cli/parse-excel";
 
-const result = parseExcelFile("./path/to/specifications.xlsx");
-console.log(result.packs);
-console.log(result.variants);
+try {
+  const result = parseExcelFile("./path/to/specifications.xlsx");
+  console.log(result.packs);
+  console.log(result.variants);
+} catch (error) {
+  console.error("Validation or parsing error:", error);
+}
 ```
