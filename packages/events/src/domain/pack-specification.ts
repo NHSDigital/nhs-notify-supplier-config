@@ -2,8 +2,8 @@ import { z } from "zod";
 import {
   $Version,
   ConfigBase,
-} from "@nhsdigital/nhs-notify-schemas-supplier-config/src/domain/common";
-import { idRef } from "@nhsdigital/nhs-notify-schemas-supplier-config/src/helpers/id-ref";
+} from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/common";
+import { idRef } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/helpers/id-ref";
 
 export const $PackFeature = z.enum(["MAILMARK", "BRAILLE", "AUDIO", "ADMAIL"]);
 export const $EnvelopeFeature = z.enum([

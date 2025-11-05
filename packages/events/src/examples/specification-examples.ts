@@ -1,13 +1,13 @@
 import {
   LetterVariant,
   LetterVariantId,
-} from "@nhsdigital/nhs-notify-schemas-supplier-config/src/domain/letter-variant";
-import { Version } from "@nhsdigital/nhs-notify-schemas-supplier-config/src/domain/common";
+} from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/letter-variant";
+import { Version } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/common";
 import {
   EnvelopeId,
   PackSpecification,
   PackSpecificationId,
-} from "@nhsdigital/nhs-notify-schemas-supplier-config/src/domain/pack-specification";
+} from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/pack-specification";
 
 const bauStandardC5: PackSpecification = {
   id: PackSpecificationId("bau-standard-c5"),
@@ -69,15 +69,15 @@ const sameDay: PackSpecification = {
   },
 };
 
-const digitrials1: PackSpecification = {
-  id: PackSpecificationId("digitrials1"),
-  name: "Digitrials Letter Pack 1",
+const clientPack1: PackSpecification = {
+  id: PackSpecificationId("client1-campaign1"),
+  name: "Client1 Letter Pack 1",
   status: "PUBLISHED",
   version: Version("1.0.0"),
   createdAt: new Date("2023-01-01T00:00:00Z"),
   updatedAt: new Date("2023-01-01T00:00:00Z"),
   assembly: {
-    envelopeId: EnvelopeId("digitrials-envelope1-c5"),
+    envelopeId: EnvelopeId("client1-envelope1-c5"),
     features: ["ADMAIL"],
   },
 };
@@ -124,14 +124,14 @@ const variants: Record<string, LetterVariant> = {
     status: "PUBLISHED",
   },
   digitrials1: {
-    id: LetterVariantId("digitrials1"),
-    name: "Digitrials Letter Variant 1",
-    description: "Digitrials Letter Variant 1",
-    packSpecificationIds: [digitrials1.id],
+    id: LetterVariantId("client1"),
+    name: "Client 1 Letter Variant 1",
+    description: "Client 1 Letter Variant 1",
+    packSpecificationIds: [clientPack1.id],
     type: "STANDARD",
     status: "PUBLISHED",
-    clientId: "digitrials",
-    campaignIds: ["digitrials-campaign-1"],
+    clientId: "client1",
+    campaignIds: ["client1-campaign1"],
   },
 };
 

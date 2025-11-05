@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { $ChannelType } from "@nhsdigital/nhs-notify-schemas-supplier-config/src/domain/channel";
-import { ConfigBase } from "@nhsdigital/nhs-notify-schemas-supplier-config/src/domain/common";
+import { $ChannelType } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/channel";
+import { ConfigBase } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/common";
 
 export const $ChannelSupplier = ConfigBase("ChannelSupplier")
   .extend({

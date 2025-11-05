@@ -1,6 +1,6 @@
 import { z } from "zod";
 import * as fs from "node:fs";
-import packageJson from "@nhsdigital/nhs-notify-schemas-supplier-config/package.json";
+import packageJson from "@nhsdigital/nhs-notify-event-schemas-supplier-config/package.json";
 
 const { version } = packageJson;
 

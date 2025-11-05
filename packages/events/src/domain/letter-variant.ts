@@ -1,6 +1,6 @@
-import { ConfigBase } from "@nhsdigital/nhs-notify-schemas-supplier-config/src/domain/common";
-import { idRef } from "@nhsdigital/nhs-notify-schemas-supplier-config/src/helpers/id-ref";
-import { $PackSpecification } from "@nhsdigital/nhs-notify-schemas-supplier-config/src/domain/pack-specification";
+import { ConfigBase } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/common";
+import { idRef } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/helpers/id-ref";
+import { $PackSpecification } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/pack-specification";
 import { z } from "zod";
 
 export const $LetterType = z.enum([
@@ -10,12 +10,14 @@ export const $LetterType = z.enum([
   "SAME_DAY",
 ]);
 
+export const $LetterVariantStatus = z.enum(["DRAFT", "PUBLISHED", "DISABLED"]);
+
 export const $LetterVariant = ConfigBase("LetterVariant")
   .extend({
     name: z.string(),
     description: z.string().optional(),
     type: $LetterType,
-    status: z.enum(["DRAFT", "PUBLISHED", "DISABLED"]),
+    status: $LetterVariantStatus,
     clientId: z.string().optional(),
     campaignIds: z.array(z.string()).optional(),
     packSpecificationIds: z.array(idRef($PackSpecification)).nonempty(),

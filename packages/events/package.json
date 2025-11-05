@@ -13,7 +13,7 @@
     "typescript": "^5.9.2"
   },
   "main": "src/index.ts",
-  "name": "@nhsdigital/nhs-notify-schemas-supplier-config",
+  "name": "@nhsdigital/nhs-notify-event-schemas-supplier-config",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
   },

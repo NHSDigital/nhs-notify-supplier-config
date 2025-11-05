@@ -3,8 +3,8 @@ import {
   EnvelopeId,
   PackSpecification,
   PackSpecificationId,
-} from "@nhsdigital/nhs-notify-schemas-supplier-config/src/domain/pack-specification";
-import { $Version } from "@nhsdigital/nhs-notify-schemas-supplier-config/src/domain/common";
+} from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/pack-specification";
+import { $Version } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/common";
 
 describe("Specification schema validation", () => {
   const standardLetterSpecification: PackSpecification = {

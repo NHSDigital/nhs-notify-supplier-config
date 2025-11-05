@@ -1,12 +1,12 @@
 import {
   $SpecificationSupplier,
   SpecificationSupplier,
-} from "@nhsdigital/nhs-notify-schemas-supplier-config/src/domain/specification-supplier";
+} from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/specification-supplier";
 import {
   EnvelopeId,
   PackSpecification,
-} from "@nhsdigital/nhs-notify-schemas-supplier-config/src/domain/pack-specification";
-import { $Version } from "@nhsdigital/nhs-notify-schemas-supplier-config/src/domain/common";
+} from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/pack-specification";
+import { $Version } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/common";
 
 describe("SpecificationSupplier schema validation", () => {
   const standardLetterSpecification: PackSpecification = {
