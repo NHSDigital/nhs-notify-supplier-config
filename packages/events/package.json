@@ -21,7 +21,8 @@
   "scripts": {
     "build": "tsc",
     "dev": "ts-node src/index.ts",
-    "json": "ts-node src/cli/generate-json.ts",
+    "examples": "ts-node src/examples/specification-examples.ts",
+    "gen:json": "ts-node src/cli/generate-json.ts",
     "start": "node dist/index.js",
     "test": "jest",
     "test:unit": "jest"

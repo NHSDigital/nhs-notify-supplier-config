@@ -1,7 +1,7 @@
 import {
-  TemplateSpecificaitonId,
-  TemplateSpecification,
-} from "@nhsdigital/nhs-notify-schemas-supplier-config/src/domain/template-specification";
+  LetterVariant,
+  LetterVariantId,
+} from "@nhsdigital/nhs-notify-schemas-supplier-config/src/domain/letter-variant";
 import { Version } from "@nhsdigital/nhs-notify-schemas-supplier-config/src/domain/common";
 import {
   EnvelopeId,
@@ -90,49 +90,50 @@ const packs = {
   sameDay,
 };
 
-const specifications: Record<string, TemplateSpecification> = {
+const specifications: Record<string, LetterVariant> = {
   bauStandard: {
-    id: TemplateSpecificaitonId("bau-standard"),
+    id: LetterVariantId("bau-standard"),
     name: "BAU Standard Letter",
     description: "BAU Standard Letter",
     packSpecificationIds: [bauStandardC5.id, bauStandardC4.id],
-    templateType: "LETTER_STANDARD",
+    letterType: "LETTER_STANDARD",
     status: "PUBLISHED",
   },
   braille: {
-    id: TemplateSpecificaitonId("braille"),
+    id: LetterVariantId("braille"),
     name: "Braille Letter",
     description: "Braille Letter",
     packSpecificationIds: [braille.id],
-    templateType: "LETTER_BRAILLE",
+    letterType: "LETTER_BRAILLE",
     status: "PUBLISHED",
   },
   audio: {
-    id: TemplateSpecificaitonId("audio"),
+    id: LetterVariantId("audio"),
     name: "Audio Letter",
     description: "Audio Letter",
     packSpecificationIds: [audio.id],
-    templateType: "LETTER_AUDIO",
+    letterType: "LETTER_AUDIO",
     status: "PUBLISHED",
   },
   sameDay: {
-    id: TemplateSpecificaitonId("same-day"),
+    id: LetterVariantId("same-day"),
     name: "Same Day Letter",
     description: "Same Day Letter",
     packSpecificationIds: [sameDay.id],
-    templateType: "LETTER_SAME_DAY",
+    letterType: "LETTER_SAME_DAY",
     status: "PUBLISHED",
   },
   digitrials1: {
-    id: TemplateSpecificaitonId("digitrials1"),
-    name: "Digitrials Letter Specification 1",
-    description: "Digitrials Letter Pack 1",
+    id: LetterVariantId("digitrials1"),
+    name: "Digitrials Letter Variant 1",
+    description: "Digitrials Letter Variant 1",
     packSpecificationIds: [digitrials1.id],
-    templateType: "LETTER_STANDARD",
+    letterType: "LETTER_STANDARD",
     status: "PUBLISHED",
     clientId: "digitrials",
     campaignIds: ["digitrials-campaign-1"],
   },
 };
 
-console.log(JSON.stringify(specifications, null, 2));
+// eslint-disable-next-line no-console
+console.log(JSON.stringify({ packs, specifications }, null, 2));

@@ -11,7 +11,6 @@ export const $EnvelopeFeature = z.enum([
   "NHS_BRANDING",
   "NHS_BARCODE",
 ]);
-export const $SpecificationStatus = z.enum(["DRAFT", "PUBLISHED", "DISABLED"]);
 
 export const $Envelope = ConfigBase("Envelope")
   .extend({
@@ -37,7 +36,7 @@ export type InsertId = Insert["id"];
 export const $PackSpecification = ConfigBase("PackSpecification")
   .extend({
     name: z.string(),
-    status: $SpecificationStatus,
+    status: z.enum(["DRAFT", "PUBLISHED", "DISABLED"]),
     createdAt: z.date(),
     updatedAt: z.date(),
     version: $Version,
