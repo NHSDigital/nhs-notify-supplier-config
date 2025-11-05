@@ -90,13 +90,13 @@ const packs = {
   sameDay,
 };
 
-const specifications: Record<string, LetterVariant> = {
+const variants: Record<string, LetterVariant> = {
   bauStandard: {
     id: LetterVariantId("bau-standard"),
     name: "BAU Standard Letter",
     description: "BAU Standard Letter",
     packSpecificationIds: [bauStandardC5.id, bauStandardC4.id],
-    letterType: "LETTER_STANDARD",
+    type: "STANDARD",
     status: "PUBLISHED",
   },
   braille: {
@@ -104,7 +104,7 @@ const specifications: Record<string, LetterVariant> = {
     name: "Braille Letter",
     description: "Braille Letter",
     packSpecificationIds: [braille.id],
-    letterType: "LETTER_BRAILLE",
+    type: "BRAILLE",
     status: "PUBLISHED",
   },
   audio: {
@@ -112,7 +112,7 @@ const specifications: Record<string, LetterVariant> = {
     name: "Audio Letter",
     description: "Audio Letter",
     packSpecificationIds: [audio.id],
-    letterType: "LETTER_AUDIO",
+    type: "AUDIO",
     status: "PUBLISHED",
   },
   sameDay: {
@@ -120,7 +120,7 @@ const specifications: Record<string, LetterVariant> = {
     name: "Same Day Letter",
     description: "Same Day Letter",
     packSpecificationIds: [sameDay.id],
-    letterType: "LETTER_SAME_DAY",
+    type: "SAME_DAY",
     status: "PUBLISHED",
   },
   digitrials1: {
@@ -128,7 +128,7 @@ const specifications: Record<string, LetterVariant> = {
     name: "Digitrials Letter Variant 1",
     description: "Digitrials Letter Variant 1",
     packSpecificationIds: [digitrials1.id],
-    letterType: "LETTER_STANDARD",
+    type: "STANDARD",
     status: "PUBLISHED",
     clientId: "digitrials",
     campaignIds: ["digitrials-campaign-1"],
@@ -136,4 +136,4 @@ const specifications: Record<string, LetterVariant> = {
 };
 
 // eslint-disable-next-line no-console
-console.log(JSON.stringify({ packs, specifications }, null, 2));
+console.log(JSON.stringify({ packs, variants }, null, 2));
