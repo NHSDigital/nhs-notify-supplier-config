@@ -21,7 +21,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "jest",
-    "test:unit": "jest",
+    "test:unit": "jest --passWithNoTests",
     "typecheck": "tsc --noEmit"
   },
   "version": "0.0.1"
