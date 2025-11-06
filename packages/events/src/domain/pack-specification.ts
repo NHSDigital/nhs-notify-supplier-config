@@ -37,24 +37,15 @@ export const $PackSpecification = ConfigBase("PackSpecification")
     createdAt: z.iso.datetime(),
     updatedAt: z.iso.datetime(),
     version: z.int(),
-    billing: z
-      .object({
-        basePrice: z.number(),
-        unitPrice: z.number(),
-      })
-      .partial()
-      .optional(),
-    postage: z
-      .object({
-        tariff: z.string(),
-        size: z.string(),
-        deliverySLA: z.number(),
-        maxSheets: z.number(),
-        maxWeight: z.number().optional(),
-        maxThickness: z.number().optional(),
-      })
-      .partial()
-      .optional(),
+    billingId: z.string().optional(),
+    postage: z.object({
+      tariff: z.string(),
+      size: z.string(),
+      maxSheets: z.number().optional(),
+      deliverySLA: z.number().optional(),
+      maxWeight: z.number().optional(),
+      maxThickness: z.number().optional(),
+    }),
     assembly: z
       .object({
         envelopeId: idRef($Envelope),

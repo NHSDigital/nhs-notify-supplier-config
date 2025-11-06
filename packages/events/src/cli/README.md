@@ -48,6 +48,13 @@ Columns:
 - `version` (required): Version number as an integer (e.g., 1, 2, 3)
 - `createdAt` (required): ISO date string
 - `updatedAt` (required): ISO date string
+- `billingId` (optional): Billing identifier for the pack specification
+- `postage.tariff` (optional): Postage tariff code/name
+- `postage.size` (optional): Postage size specification
+- `postage.maxSheets` (optional): Maximum number of sheets (integer)
+- `postage.deliverySLA` (optional): Delivery SLA in days (integer)
+- `postage.maxWeight` (optional): Maximum weight in grams (number)
+- `postage.maxThickness` (optional): Maximum thickness in millimeters (number)
 - `envelopeId` (optional): Reference to an envelope ID
 - `features` (optional): Comma-separated list of features (MAILMARK, BRAILLE, AUDIO, ADMAIL)
 
@@ -78,6 +85,13 @@ The script generates a JSON file with the following structure:
       "version": 1,
       "createdAt": "2023-01-01T00:00:00.000Z",
       "updatedAt": "2023-01-01T00:00:00.000Z",
+      "billingId": "billing-id",
+      "postage": {
+        "tariff": "2ND_CLASS",
+        "size": "LARGE",
+        "maxSheets": 5,
+        "deliverySLA": 3
+      },
       "assembly": {
         "envelopeId": "envelope-id",
         "features": ["BRAILLE"]

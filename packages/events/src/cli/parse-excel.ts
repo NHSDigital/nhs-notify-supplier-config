@@ -21,10 +21,17 @@ interface PackSpecificationRow {
   version: string;
   createdAt: string;
   updatedAt: string;
+  billingId?: string;
   envelopeId?: string;
   features?: string;
   "assembly.envelopeId"?: string;
   "assembly.features"?: string;
+  "postage.tariff"?: string;
+  "postage.size"?: string;
+  "postage.maxSheets"?: string;
+  "postage.deliverySLA"?: string;
+  "postage.maxWeight"?: string;
+  "postage.maxThickness"?: string;
 }
 
 interface LetterVariantRow {
@@ -65,7 +72,7 @@ function parseArray(value: string | undefined): string[] | undefined {
  * Parse PackSpecification from Excel row
  */
 function parsePackSpecification(row: PackSpecificationRow): PackSpecification {
-  const pack: PackSpecification = {
+  const pack: Partial<PackSpecification> = {
     id: PackSpecificationId(row.id),
     name: row.name,
     status: row.status as "DRAFT" | "PUBLISHED" | "DISABLED",
@@ -73,6 +80,37 @@ function parsePackSpecification(row: PackSpecificationRow): PackSpecification {
     createdAt: parseDate(row.createdAt),
     updatedAt: parseDate(row.updatedAt),
   };
+
+  // Add billingId if present
+  if (row.billingId) {
+    pack.billingId = row.billingId;
+  }
+
+  // Build postage object - tariff and size are required if postage is provided
+  if (row["postage.tariff"] && row["postage.size"]) {
+    const postage: PackSpecification["postage"] = {
+      tariff: row["postage.tariff"],
+      size: row["postage.size"],
+    };
+
+    if (row["postage.maxSheets"]) {
+      postage.maxSheets = Number.parseInt(row["postage.maxSheets"], 10);
+    }
+
+    if (row["postage.deliverySLA"]) {
+      postage.deliverySLA = Number.parseInt(row["postage.deliverySLA"], 10);
+    }
+
+    if (row["postage.maxWeight"]) {
+      postage.maxWeight = Number.parseFloat(row["postage.maxWeight"]);
+    }
+
+    if (row["postage.maxThickness"]) {
+      postage.maxThickness = Number.parseFloat(row["postage.maxThickness"]);
+    }
+
+    pack.postage = postage;
+  }
 
   // Build assembly object if needed
   const assembly: NonNullable<PackSpecification["assembly"]> = {};
