@@ -13,6 +13,7 @@ drawio
 endcapture
 endfor
 endraw
+env
 Git[Hh]ub
 Gitleaks
 Grype
@@ -26,6 +27,7 @@ Podman
 Python
 rawContent
 sed
+stdout
 Syft
 Terraform
 toolchain

@@ -7,12 +7,10 @@
   "devDependencies": {
     "@types/jest": "^29.5.14",
     "@types/node": "^22.13.4",
-    "@types/xlsx": "^0.0.35",
     "jest": "^29.7.0",
     "ts-jest": "^29.4.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.2",
-    "xlsx": "^0.18.5"
+    "typescript": "^5.9.2"
   },
   "main": "src/index.ts",
   "name": "@nhsdigital/nhs-notify-event-schemas-supplier-config",
@@ -25,7 +23,6 @@
     "dev": "ts-node src/index.ts",
     "examples": "ts-node src/examples/specification-examples.ts",
     "gen:json": "ts-node src/cli/generate-json.ts",
-    "parse:excel": "ts-node src/cli/parse-excel.ts",
     "start": "node dist/index.js",
     "test": "jest",
     "test:unit": "jest"

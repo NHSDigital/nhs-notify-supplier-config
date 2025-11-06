@@ -35,6 +35,46 @@ Event publishing strategies include:
 - CLI tools (tactical)
 - Admin/Web UI (strategic, single source of truth)
 
+## Event Builder CLI
+
+The Excel parsing and event publishing functionality now lives in the `event-builder` package, exposed via a single CLI with subcommands.
+
+### Commands
+
+- `parse` – Parse an Excel specification file and emit JSON to stdout (packs + variants).
+- `publish` – Build specialised (non-draft) LetterVariant events and publish them to an AWS EventBridge bus.
+
+### Quick Start
+
+```bash
+# Parse
+npm run cli:events --workspace=nhs-notify-supplier-config-event-builder -- parse -f ./specifications.xlsx
+
+# Dry-run publish (no AWS calls)
+npm run cli:events --workspace=nhs-notify-supplier-config-event-builder -- publish -f ./specifications.xlsx -b my-bus --dry-run
+
+# Publish (requires AWS credentials with events:PutEvents)
+npm run cli:events --workspace=nhs-notify-supplier-config-event-builder -- publish -f ./specifications.xlsx -b my-bus -r eu-west-2
+```
+
+### Envelope Defaults
+
+Source: `/control-plane/supplier-config/<env>/<service>` built from `EVENT_ENV` (default `dev`) and `EVENT_SERVICE` (default `events`).
+
+Other generated fields:
+
+- `severitytext` INFO / `severitynumber` 2
+- `partitionkey` LetterVariant id
+- `sequence` Incrementing zero-padded 20-digit counter per run
+- `traceparent` Random W3C trace context value
+- `dataschema` & `dataschemaversion` fixed to example `1.0.0`
+
+Set environment overrides:
+
+```bash
+EVENT_ENV=staging EVENT_SERVICE=config npm run cli:events --workspace=nhs-notify-supplier-config-event-builder -- publish -f specs.xlsx -b staging-bus -r eu-west-2
+```
+
 ## Usage
 
 ### Testing
