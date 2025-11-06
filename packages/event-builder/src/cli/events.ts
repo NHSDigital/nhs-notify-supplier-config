@@ -9,6 +9,8 @@ import {
 } from "@aws-sdk/client-eventbridge";
 import { parseExcelFile } from "event-builder/src/lib/parse-excel";
 import { buildLetterVariantEvents } from "event-builder/src/letter-variant-event-builder";
+import { buildPackSpecificationEvents } from "event-builder/src/pack-specification-event-builder";
+import { nextSequence } from "event-builder/src/lib/envelope-helpers";
 
 interface CommonArgs {
   file: string;
@@ -20,10 +22,14 @@ interface PublishArgs extends CommonArgs {
 }
 
 function ensureFile(file: string): string {
-  const resolved = path.isAbsolute(file)
-    ? file
-    : path.join(process.cwd(), file || "specifications.xlsx");
-  // Use statSync with try/catch to satisfy security lint (literal path already constructed)
+  const candidate = file || "specifications.xlsx";
+  const resolved = path.isAbsolute(candidate)
+    ? candidate
+    : path.join(process.cwd(), candidate);
+  // Basic allowlist check: must end with .xlsx
+  if (!/\.xlsx$/i.test(resolved)) {
+    throw new Error(`Input file must be an .xlsx file: ${resolved}`);
+  }
   try {
     fs.statSync(resolved);
   } catch {
@@ -49,10 +55,18 @@ function chunk<T>(arr: T[], size: number): T[][] {
 
 async function handlePublish(args: PublishArgs): Promise<void> {
   const inputFile = ensureFile(args.file);
-  console.log(`Reading variants from: ${inputFile}`);
-  const { variants } = parseExcelFile(inputFile);
-  const events = buildLetterVariantEvents(variants);
-  console.log(`Built ${events.length} LetterVariant events (non-draft only)`);
+  const { packs, variants } = parseExcelFile(inputFile);
+  console.log(`Reading variants & packs from: ${inputFile}`);
+  // Build pack specification events first, then letter variant events continuing sequence
+  const packEvents = buildPackSpecificationEvents(packs, 1);
+  const variantEvents = buildLetterVariantEvents(variants).map((ev, idx) => {
+    // Re-sequence variant events after packs for single ordering across all
+    return { ...ev, sequence: nextSequence(packEvents.length + idx + 1) };
+  });
+  const events = [...packEvents, ...variantEvents];
+  console.log(
+    `Built ${packEvents.length} PackSpecification events and ${variantEvents.length} LetterVariant events (non-draft only)`,
+  );
 
   if (args.dryRun) {
     console.log(
@@ -68,7 +82,6 @@ async function handlePublish(args: PublishArgs): Promise<void> {
     throw new Error("AWS region not specified (flag or AWS_REGION env)");
 
   const client = new EventBridgeClient({ region });
-  let sent = 0;
   for (const batch of chunk(events, 10)) {
     const Entries = batch.map((e) => ({
       DetailType: e.type,
@@ -86,14 +99,15 @@ async function handlePublish(args: PublishArgs): Promise<void> {
         process.exitCode = 1;
         return;
       }
-      sent += Entries.length;
     } catch (error) {
       console.error("Error sending events batch", error);
       process.exitCode = 1;
       return;
     }
   }
-  console.log(`Successfully published ${sent} events to bus ${args.bus}`);
+  console.log(
+    `Successfully published ${events.length} events to bus ${args.bus}`,
+  );
 }
 
 async function main(): Promise<void> {
@@ -120,7 +134,7 @@ async function main(): Promise<void> {
     )
     .command<PublishArgs>(
       "publish",
-      "Publish LetterVariant events to EventBridge",
+      "Publish PackSpecification and LetterVariant events to EventBridge",
       (cmd) =>
         cmd
           .option("file", {

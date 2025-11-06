@@ -5,3 +5,4 @@ export * from "./domain/supplier-quota";
 export * from "./domain/pack-specification";
 export * from "./domain/specification-supplier";
 export * from "./domain/letter-variant";
+export * from "./events/pack-specification-events";
