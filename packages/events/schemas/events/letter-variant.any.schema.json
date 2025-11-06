@@ -44,14 +44,13 @@
       "title": "Letter event type",
       "description": "Event type using reverse-DNS style",
       "examples": [
-        "uk.nhs.notify.supplier-config.letter-variant.DRAFT.v1",
-        "uk.nhs.notify.supplier-config.letter-variant.PUBLISHED.v1",
-        "uk.nhs.notify.supplier-config.letter-variant.DISABLED.v1"
+        "uk.nhs.notify.supplier-config.letter-variant.published.v1",
+        "uk.nhs.notify.supplier-config.letter-variant.disabled.v1"
       ],
       "type": "string",
       "enum": [
-        "uk.nhs.notify.supplier-config.letter-variant.PUBLISHED.v1",
-        "uk.nhs.notify.supplier-config.letter-variant.DISABLED.v1"
+        "uk.nhs.notify.supplier-config.letter-variant.published.v1",
+        "uk.nhs.notify.supplier-config.letter-variant.disabled.v1"
       ]
     },
     "time": {
@@ -79,10 +78,11 @@
       "title": "Data Schema URI",
       "description": "URI of a schema that describes the event data\n\nData schema version must match the major version indicated by the type",
       "examples": [
-        "https://notify.nhs.uk/cloudevents/schemas/supplier-config.letter-variant.PUBLISHED.1.0.0.schema.json"
+        "https://notify.nhs.uk/cloudevents/schemas/supplier-config.letter-variant.published.1.0.0.schema.json",
+        "https://notify.nhs.uk/cloudevents/schemas/supplier-config.letter-variant.disabled.1.0.0.schema.json"
       ],
       "type": "string",
-      "pattern": "^https:\\/\\/notify\\.nhs\\.uk\\/cloudevents\\/schemas\\/supplier-config\\/letter-variant\\.(?<status>PUBLISHED|DISABLED)\\.1\\.\\d+\\.\\d+\\.schema.json$"
+      "pattern": "^https:\\/\\/notify\\.nhs\\.uk\\/cloudevents\\/schemas\\/supplier-config\\/letter-variant\\.(?<status>published|disabled)\\.1\\.\\d+\\.\\d+\\.schema.json$"
     },
     "data": {
       "description": "A Letter Variant describes a letter that can be produced with particular characteristics, and may be scoped to a single clientId and campaignId.",

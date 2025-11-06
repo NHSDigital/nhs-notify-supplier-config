@@ -1,6 +1,6 @@
 {
-  "title": "letter.PUBLISHED Event",
-  "description": "Event schema for letter status change to PUBLISHED",
+  "title": "letter-variant.disabled Event",
+  "description": "Event schema for letter variant change to DISABLED",
   "type": "object",
   "properties": {
     "specversion": {
@@ -41,14 +41,14 @@
       "pattern": "^supplier-config\\/letter-variant\\/[a-z0-9-]+"
     },
     "type": {
-      "title": "LetterVariant PUBLISHED event type",
+      "title": "LetterVariant DISABLED event type",
       "description": "Event type using reverse-DNS style",
       "examples": [
-        "uk.nhs.notify.supplier-config.letter-variant.PUBLISHED.v1"
+        "uk.nhs.notify.supplier-config.letter-variant.disabled.v1"
       ],
       "type": "string",
       "enum": [
-        "uk.nhs.notify.supplier-config.letter-variant.PUBLISHED.v1"
+        "uk.nhs.notify.supplier-config.letter-variant.disabled.v1"
       ]
     },
     "time": {
@@ -76,14 +76,14 @@
       "title": "Data Schema URI",
       "description": "URI of a schema that describes the event data\n\nData schema version must match the major version indicated by the type",
       "examples": [
-        "https://notify.nhs.uk/cloudevents/schemas/supplier-config/letter-variant.PUBLISHED.1.0.0.schema.json"
+        "https://notify.nhs.uk/cloudevents/schemas/supplier-config/letter-variant.disabled.1.0.0.schema.json"
       ],
       "type": "string",
-      "pattern": "^https:\\/\\/notify\\.nhs\\.uk\\/cloudevents\\/schemas\\/supplier-config\\/letter-variant.PUBLISHED.1\\.\\d+\\.\\d+\\.schema.json$"
+      "pattern": "^https:\\/\\/notify\\.nhs\\.uk\\/cloudevents\\/schemas\\/supplier-config\\/letter-variant.disabled.1\\.\\d+\\.\\d+\\.schema.json$"
     },
     "data": {
       "title": "Letter Variant",
-      "description": "A Letter Variant describes a letter that can be produced with particular characteristics, and may be scoped to a single clientId and campaignId.\n\nFor this event the status is always `PUBLISHED`",
+      "description": "A Letter Variant describes a letter that can be produced with particular characteristics, and may be scoped to a single clientId and campaignId.\n\nFor this event the status is always `DISABLED`",
       "type": "object",
       "properties": {
         "id": {
@@ -107,7 +107,7 @@
         "status": {
           "type": "string",
           "enum": [
-            "PUBLISHED"
+            "DISABLED"
           ]
         },
         "clientId": {
