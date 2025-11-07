@@ -2,8 +2,11 @@ import * as XLSX from "xlsx";
 import {
   $PackSpecification,
   EnvelopeId,
+  InsertId,
   PackSpecification,
   PackSpecificationId,
+  PaperId,
+  PostageId,
 } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/pack-specification";
 import {
   $LetterVariant,
@@ -19,16 +22,29 @@ interface PackSpecificationRow {
   createdAt: string;
   updatedAt: string;
   billingId?: string;
-  envelopeId?: string;
-  features?: string;
-  "assembly.envelopeId"?: string;
-  "assembly.features"?: string;
-  "postage.tariff"?: string;
-  "postage.size"?: string;
-  "postage.maxSheets"?: string;
+  // Constraints
+  "constraints.maxSheets"?: string;
+  "constraints.deliverySLA"?: string;
+  "constraints.blackCoveragePercentage"?: string;
+  "constraints.colourCoveragePercentage"?: string;
+  // Postage (only id and size are required, plus optional fields)
+  "postage.id": string;
+  "postage.size": string;
   "postage.deliverySLA"?: string;
   "postage.maxWeight"?: string;
   "postage.maxThickness"?: string;
+  // Assembly
+  "assembly.envelopeId"?: string;
+  "assembly.printColour"?: string;
+  "assembly.paper.id"?: string;
+  "assembly.paper.name"?: string;
+  "assembly.paper.weightGSM"?: string;
+  "assembly.paper.size"?: string;
+  "assembly.paper.colour"?: string;
+  "assembly.paper.recycled"?: string;
+  "assembly.insertIds"?: string;
+  "assembly.features"?: string;
+  "assembly.additional"?: string;
 }
 
 interface LetterVariantRow {
@@ -40,6 +56,11 @@ interface LetterVariantRow {
   status: string;
   clientId?: string;
   campaignIds?: string;
+  // Constraints
+  "constraints.maxSheets"?: string;
+  "constraints.deliverySLA"?: string;
+  "constraints.blackCoveragePercentage"?: string;
+  "constraints.colourCoveragePercentage"?: string;
 }
 
 function parseDate(dateStr?: string): string {
@@ -55,25 +76,64 @@ function parseArray(value?: string): string[] | undefined {
   return value.split(",").map((item) => item.trim());
 }
 
-// Removed legacy mapping logic; Excel must provide canonical enum values.
+function parseConstraints(row: {
+  "constraints.maxSheets"?: string;
+  "constraints.deliverySLA"?: string;
+  "constraints.blackCoveragePercentage"?: string;
+  "constraints.colourCoveragePercentage"?: string;
+}): PackSpecification["constraints"] | undefined {
+  const constraints: NonNullable<PackSpecification["constraints"]> = {};
+  let hasConstraints = false;
+
+  if (row["constraints.maxSheets"]) {
+    constraints.maxSheets = Number.parseInt(row["constraints.maxSheets"], 10);
+    hasConstraints = true;
+  }
+  if (row["constraints.deliverySLA"]) {
+    constraints.deliverySLA = Number.parseInt(
+      row["constraints.deliverySLA"],
+      10,
+    );
+    hasConstraints = true;
+  }
+  if (row["constraints.blackCoveragePercentage"]) {
+    constraints.blackCoveragePercentage = Number.parseFloat(
+      row["constraints.blackCoveragePercentage"],
+    );
+    hasConstraints = true;
+  }
+  if (row["constraints.colourCoveragePercentage"]) {
+    constraints.colourCoveragePercentage = Number.parseFloat(
+      row["constraints.colourCoveragePercentage"],
+    );
+    hasConstraints = true;
+  }
+
+  return hasConstraints ? constraints : undefined;
+}
+
 function parsePostage(row: PackSpecificationRow): PackSpecification["postage"] {
-  if (!(row["postage.tariff"] && row["postage.size"])) {
+  if (!row["postage.id"] || !row["postage.size"]) {
     throw new Error(
-      `Missing required postage fields (postage.tariff & postage.size) for PackSpecification id '${row.id}'`,
+      `Missing required postage fields (postage.id & postage.size) for PackSpecification id '${row.id}'`,
     );
   }
+
   const postage: PackSpecification["postage"] = {
-    tariff: row["postage.tariff"] as PackSpecification["postage"]["tariff"],
+    id: PostageId(row["postage.id"]),
     size: row["postage.size"] as PackSpecification["postage"]["size"],
   };
-  if (row["postage.maxSheets"])
-    postage.maxSheets = Number.parseInt(row["postage.maxSheets"], 10);
-  if (row["postage.deliverySLA"])
+
+  if (row["postage.deliverySLA"]) {
     postage.deliverySLA = Number.parseInt(row["postage.deliverySLA"], 10);
-  if (row["postage.maxWeight"])
+  }
+  if (row["postage.maxWeight"]) {
     postage.maxWeight = Number.parseFloat(row["postage.maxWeight"]);
-  if (row["postage.maxThickness"])
+  }
+  if (row["postage.maxThickness"]) {
     postage.maxThickness = Number.parseFloat(row["postage.maxThickness"]);
+  }
+
   return postage;
 }
 
@@ -81,15 +141,43 @@ function parseAssembly(
   row: PackSpecificationRow,
 ): NonNullable<PackSpecification["assembly"]> | undefined {
   const assembly: NonNullable<PackSpecification["assembly"]> = {};
-  let has = false;
-  const envelopeId = row["assembly.envelopeId"] || row.envelopeId;
-  if (envelopeId) {
-    assembly.envelopeId = EnvelopeId(envelopeId);
-    has = true;
+  let hasAssembly = false;
+
+  if (row["assembly.envelopeId"]) {
+    assembly.envelopeId = EnvelopeId(row["assembly.envelopeId"]);
+    hasAssembly = true;
   }
-  const featuresStr = row["assembly.features"] || row.features;
-  if (featuresStr) {
-    const features = parseArray(featuresStr);
+
+  if (row["assembly.printColour"]) {
+    assembly.printColour = row["assembly.printColour"] as "BLACK" | "COLOUR";
+    hasAssembly = true;
+  }
+
+  // Parse paper if any paper fields are present
+  if (row["assembly.paper.id"]) {
+    assembly.paper = {
+      id: PaperId(row["assembly.paper.id"]),
+      name: row["assembly.paper.name"] || "",
+      weightGSM: Number.parseFloat(row["assembly.paper.weightGSM"] || "80"),
+      size: row["assembly.paper.size"] as "A4" | "A3",
+      colour: row["assembly.paper.colour"] as "WHITE" | "COLOURED",
+      recycled:
+        row["assembly.paper.recycled"] === "true" ||
+        row["assembly.paper.recycled"] === "TRUE",
+    };
+    hasAssembly = true;
+  }
+
+  if (row["assembly.insertIds"]) {
+    const insertIds = parseArray(row["assembly.insertIds"]);
+    if (insertIds && insertIds.length > 0) {
+      assembly.insertIds = insertIds as InsertId[];
+      hasAssembly = true;
+    }
+  }
+
+  if (row["assembly.features"]) {
+    const features = parseArray(row["assembly.features"]);
     if (features && features.length > 0) {
       assembly.features = features as (
         | "MAILMARK"
@@ -97,10 +185,20 @@ function parseAssembly(
         | "AUDIO"
         | "ADMAIL"
       )[];
-      has = true;
+      hasAssembly = true;
     }
   }
-  return has ? assembly : undefined;
+
+  if (row["assembly.additional"]) {
+    try {
+      assembly.additional = JSON.parse(row["assembly.additional"]);
+      hasAssembly = true;
+    } catch {
+      // If not valid JSON, ignore it
+    }
+  }
+
+  return hasAssembly ? assembly : undefined;
 }
 
 function parsePackSpecification(row: PackSpecificationRow): PackSpecification {
@@ -113,9 +211,15 @@ function parsePackSpecification(row: PackSpecificationRow): PackSpecification {
     updatedAt: parseDate(row.updatedAt),
     postage: parsePostage(row),
   };
+
   if (row.billingId) draft.billingId = row.billingId;
+
+  const constraints = parseConstraints(row);
+  if (constraints) draft.constraints = constraints;
+
   const assembly = parseAssembly(row);
   if (assembly) draft.assembly = assembly;
+
   const parsed = $PackSpecification.safeParse(draft);
   if (!parsed.success) {
     throw new Error(
@@ -137,8 +241,13 @@ function parseLetterVariant(row: LetterVariantRow): LetterVariant {
     status: row.status as LetterVariant["status"],
     packSpecificationIds: baseIds.map((id) => PackSpecificationId(id)),
   };
+
   if (row.clientId) draft.clientId = row.clientId;
   if (row.campaignIds) draft.campaignIds = parseArray(row.campaignIds);
+
+  const constraints = parseConstraints(row);
+  if (constraints) draft.constraints = constraints;
+
   const parsed = $LetterVariant.safeParse(draft);
   if (!parsed.success) {
     throw new Error(

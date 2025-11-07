@@ -1,10 +1,12 @@
 auditability
 auditable
 [A-Z]+s
+[Bb]oolean
 Bitwarden
 bot
 [Cc]onfig
 Cognito
+createdAt
 Cyber
 datetime
 Dependabot
@@ -13,6 +15,7 @@ drawio
 endcapture
 endfor
 endraw
+enum
 env
 Git[Hh]ub
 Gitleaks
@@ -32,4 +35,5 @@ Syft
 Terraform
 toolchain
 Trufflehog
+updatedAt
 Zod

@@ -5,7 +5,7 @@ import {
 import {
   EnvelopeId,
   PackSpecification,
-  PackSpecificationId,
+  PackSpecificationId, PostageId,
 } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/pack-specification";
 
 const bauStandardC5: PackSpecification = {
@@ -15,10 +15,12 @@ const bauStandardC5: PackSpecification = {
   version: 1,
   createdAt: "2023-01-01T00:00:00Z",
   updatedAt: "2023-01-01T00:00:00Z",
+  constraints: {
+    maxSheets: 5,
+  },
   postage: {
-    tariff: "ECONOMY",
+    id: PostageId("ECONOMY"),
     size: "STANDARD",
-    maxSheets: 6,
     deliverySLA: 3,
   },
   assembly: {
@@ -34,10 +36,12 @@ const bauStandardC4: PackSpecification = {
   version: 1,
   createdAt: "2023-01-01T00:00:00Z",
   updatedAt: "2023-01-01T00:00:00Z",
+  constraints: {
+    maxSheets: 20,
+  },
   postage: {
-    tariff: "ECONOMY",
+    id: PostageId("ECONOMY"),
     size: "LARGE",
-    maxSheets: 10,
     deliverySLA: 3,
   },
   assembly: {
@@ -53,8 +57,11 @@ const braille: PackSpecification = {
   version: 1,
   createdAt: "2023-01-01T00:00:00Z",
   updatedAt: "2023-01-01T00:00:00Z",
+  constraints: {
+    maxSheets: 5,
+  },
   postage: {
-    tariff: "ARTICLES_BLIND",
+    id: PostageId("ARTICLES_BLIND"),
     size: "STANDARD",
   },
   assembly: {
@@ -70,8 +77,11 @@ const audio: PackSpecification = {
   version: 1,
   createdAt: "2023-01-01T00:00:00Z",
   updatedAt: "2023-01-01T00:00:00Z",
+  constraints: {
+    maxSheets: 5,
+  },
   postage: {
-    tariff: "ARTICLES_BLIND",
+    id: PostageId("ARTICLES_BLIND"),
     size: "STANDARD",
   },
   assembly: {
@@ -87,10 +97,13 @@ const sameDay: PackSpecification = {
   version: 1,
   createdAt: "2023-01-01T00:00:00Z",
   updatedAt: "2023-01-01T00:00:00Z",
+  constraints: {
+    maxSheets: 5,
+  },
   postage: {
-    tariff: "FIRST",
+    id: PostageId("FIRST"),
     size: "LARGE",
-    deliverySLA: 0,
+    deliverySLA: 1,
   },
   assembly: {
     envelopeId: EnvelopeId("envelope-nhs-c4-same-day"),
@@ -105,8 +118,11 @@ const clientPack1: PackSpecification = {
   version: 1,
   createdAt: "2023-01-01T00:00:00Z",
   updatedAt: "2023-01-01T00:00:00Z",
+  constraints: {
+    maxSheets: 4,
+  },
   postage: {
-    tariff: "ADMAIL",
+    id: PostageId("ADMAIL"),
     size: "STANDARD",
     deliverySLA: 3,
   },
@@ -134,6 +150,10 @@ const variants: Record<string, LetterVariant> = {
     packSpecificationIds: [bauStandardC5.id, bauStandardC4.id],
     type: "STANDARD",
     status: "PUBLISHED",
+    constraints: {
+      maxSheets: 20,
+      deliverySLA: 3,
+    },
   },
   braille: {
     id: LetterVariantId("braille"),
@@ -142,6 +162,10 @@ const variants: Record<string, LetterVariant> = {
     packSpecificationIds: [braille.id],
     type: "BRAILLE",
     status: "PUBLISHED",
+    constraints: {
+      maxSheets: 5,
+      deliverySLA: 3,
+    },
   },
   audio: {
     id: LetterVariantId("audio"),
@@ -150,6 +174,10 @@ const variants: Record<string, LetterVariant> = {
     packSpecificationIds: [audio.id],
     type: "AUDIO",
     status: "PUBLISHED",
+    constraints: {
+      maxSheets: 5,
+      deliverySLA: 3,
+    },
   },
   sameDay: {
     id: LetterVariantId("same-day"),
@@ -158,6 +186,10 @@ const variants: Record<string, LetterVariant> = {
     packSpecificationIds: [sameDay.id],
     type: "SAME_DAY",
     status: "PUBLISHED",
+    constraints: {
+      maxSheets: 5,
+      deliverySLA: 1,
+    },
   },
   digitrials1: {
     id: LetterVariantId("client1"),
@@ -168,6 +200,10 @@ const variants: Record<string, LetterVariant> = {
     status: "PUBLISHED",
     clientId: "client1",
     campaignIds: ["client1-campaign1"],
+    constraints: {
+      maxSheets: 4,
+      deliverySLA: 3,
+    },
   },
 };
 

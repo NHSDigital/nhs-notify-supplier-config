@@ -1,6 +1,9 @@
 import { ConfigBase } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/common";
 import { idRef } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/helpers/id-ref";
-import { $PackSpecification } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/pack-specification";
+import {
+  $Constraints,
+  $PackSpecification
+} from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/pack-specification";
 import { z } from "zod";
 
 export const $LetterType = z.enum([
@@ -21,6 +24,11 @@ export const $LetterVariant = ConfigBase("LetterVariant")
     clientId: z.string().optional(),
     campaignIds: z.array(z.string()).optional(),
     packSpecificationIds: z.array(idRef($PackSpecification)).nonempty(),
+    constraints: $Constraints.optional().meta({
+      title: "LetterVariant Constraints",
+      description:
+        "Constraints that apply to this letter variant, aggregating those in the pack specifications where specified.",
+    }),
   })
   .describe("LetterVariant");
 export type LetterVariant = z.infer<typeof $LetterVariant>;

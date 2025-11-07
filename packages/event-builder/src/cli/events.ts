@@ -22,10 +22,9 @@ interface PublishArgs extends CommonArgs {
 }
 
 function ensureFile(file: string): string {
-  const candidate = file || "specifications.xlsx";
-  const resolved = path.isAbsolute(candidate)
-    ? candidate
-    : path.join(process.cwd(), candidate);
+  const resolved = path.isAbsolute(file)
+    ? file
+    : path.join(process.cwd(), file);
   // Basic allowlist check: must end with .xlsx
   if (!/\.xlsx$/i.test(resolved)) {
     throw new Error(`Input file must be an .xlsx file: ${resolved}`);

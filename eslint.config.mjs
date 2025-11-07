@@ -243,6 +243,10 @@ export default defineConfig([
     files: ['**/cli/**/*.{js,jsx,ts,tsx,mjs,cjs}'],
     rules: {
       'no-console': 0,
+      'import-x/no-extraneous-dependencies': [
+        'error',
+        { devDependencies: true },
+      ],
     },
   },
   // misc rule overrides

@@ -6,7 +6,7 @@ import { ConfigBase } from "@nhsdigital/nhs-notify-event-schemas-supplier-config
 
 export const $SpecificationSupplier = ConfigBase("SpecificationSupplier")
   .extend({
-    specificationId: idRef($PackSpecification),
+    packSpecificationId: idRef($PackSpecification),
     supplierId: idRef($ChannelSupplier),
   })
   .describe("SpecificationSupplier");

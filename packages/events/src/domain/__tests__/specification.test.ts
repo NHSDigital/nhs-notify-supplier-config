@@ -3,6 +3,7 @@ import {
   EnvelopeId,
   PackSpecification,
   PackSpecificationId,
+  PostageId,
 } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/pack-specification";
 
 describe("Specification schema validation", () => {
@@ -14,10 +15,9 @@ describe("Specification schema validation", () => {
     updatedAt: "2023-01-01T00:00:00Z",
     version: 1,
     postage: {
-      tariff: "economy",
-      size: "letter",
+      id: PostageId("economy"),
+      size: "STANDARD",
       deliverySLA: 4,
-      maxSheets: 5,
     },
     assembly: {
       envelopeId: EnvelopeId("nhs-economy"),

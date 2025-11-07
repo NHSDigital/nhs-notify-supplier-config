@@ -14,6 +14,7 @@ export const $Envelope = ConfigBase("Envelope")
     name: z.string(),
     size: z.enum(["C5", "C4", "DL"]),
     features: z.array($EnvelopeFeature).optional(),
+    artwork: z.url().optional(),
   })
   .describe("Envelope");
 export type Envelope = z.infer<typeof $Envelope>;
@@ -30,6 +31,36 @@ export const $Insert = ConfigBase("Insert")
 export type Insert = z.infer<typeof $Insert>;
 export type InsertId = Insert["id"];
 
+export const $Constraints = z.object({
+  maxSheets: z.number().optional(),
+  deliverySLA: z.number().optional(),
+  blackCoveragePercentage: z.number().optional(),
+  colourCoveragePercentage: z.number().optional(),
+});
+
+export const $Postage = ConfigBase("Postage")
+  .extend({
+    size: z.enum(["STANDARD", "LARGE"]),
+    deliverySLA: z.number().optional(),
+    maxWeight: z.number().optional(),
+    maxThickness: z.number().optional(),
+  })
+  .describe("Postage");
+export type Postage = z.infer<typeof $Postage>;
+export const PostageId = $Postage.shape.id.parse;
+
+export const $Paper = ConfigBase("Paper")
+  .extend({
+    name: z.string(),
+    weightGSM: z.number(),
+    size: z.enum(["A4", "A3"]),
+    colour: z.enum(["WHITE", "COLOURED"]),
+    recycled: z.boolean(),
+  })
+  .describe("Paper");
+export type Paper = z.infer<typeof $Paper>;
+export const PaperId = $Paper.shape.id.parse;
+
 export const $PackSpecification = ConfigBase("PackSpecification")
   .extend({
     name: z.string(),
@@ -38,26 +69,14 @@ export const $PackSpecification = ConfigBase("PackSpecification")
     updatedAt: z.iso.datetime(),
     version: z.int(),
     billingId: z.string().optional(),
-    postage: z.object({
-      tariff: z.enum([
-        "ECONOMY",
-        "FIRST",
-        "SECOND",
-        "ADMAIL",
-        "ARTICLES_BLIND",
-      ]),
-      size: z.enum(["STANDARD", "LARGE"]),
-      maxSheets: z.number().optional(),
-      deliverySLA: z.number().optional(),
-      maxWeight: z.number().optional(),
-      maxThickness: z.number().optional(),
-    }),
+    constraints: $Constraints.optional(),
+    postage: $Postage,
     assembly: z
       .object({
         envelopeId: idRef($Envelope),
         printColour: z.enum(["BLACK", "COLOUR"]),
-        paperColour: z.string().optional(),
-        insert: idRef($Insert).optional(),
+        paper: $Paper,
+        insertIds: z.array(idRef($Insert)).optional(),
         features: z.array($PackFeature).optional(),
         additional: z.record(z.string(), z.string()).optional(),
       })
