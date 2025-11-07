@@ -9,6 +9,9 @@ import {
   nextSequence,
   severityNumber,
 } from "event-builder/src/lib/envelope-helpers";
+import packageJson from "@nhsdigital/nhs-notify-event-schemas-supplier-config/package.json";
+
+const dataschemaversion = packageJson.version;
 
 export interface BuildLetterVariantEventOptions {
   severity?: SeverityText;
@@ -36,8 +39,7 @@ export const buildLetterVariantEvent = (
     );
   }
   const now = new Date().toISOString();
-  const dataschemaversion = "1.0.0"; // fixed version per examples
-  const dataschema = `https://notify.nhs.uk/cloudevents/schemas/supplier-config/letter-variant.${lcStatus}.1.0.0.schema.json`;
+  const dataschema = `https://notify.nhs.uk/cloudevents/schemas/supplier-config/letter-variant.${lcStatus}.${dataschemaversion}.schema.json`;
   const severity = opts.severity ?? "INFO";
   const baseEvent = {
     specversion: "1.0",
