@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { LetterVariant } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/letter-variant";
 import { letterVariantEvents } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/events/letter-variant-events";
 import { z } from "zod";
-import { buildEventSource } from "event-builder/src/config";
+import { buildEventSource, configFromEnv } from "event-builder/src/config";
 import {
   SeverityText,
   generateTraceParent,
@@ -22,6 +22,7 @@ export type LetterVariantSpecialisedEvent = z.infer<
 export const buildLetterVariantEvent = (
   variant: LetterVariant,
   opts: BuildLetterVariantEventOptions & { sequenceCounter?: number } = {},
+  config = configFromEnv(),
 ): LetterVariantSpecialisedEvent | undefined => {
   if (variant.status === "DRAFT") return undefined; // skip drafts
 
@@ -41,7 +42,7 @@ export const buildLetterVariantEvent = (
   const baseEvent = {
     specversion: "1.0",
     id: randomUUID(),
-    source: buildEventSource(),
+    source: buildEventSource(config),
     subject: `supplier-config/letter-variant/${variant.id}`,
     type: specialised.shape.type.value,
     time: now,

@@ -39,8 +39,14 @@ export const $PackSpecification = ConfigBase("PackSpecification")
     version: z.int(),
     billingId: z.string().optional(),
     postage: z.object({
-      tariff: z.string(),
-      size: z.string(),
+      tariff: z.enum([
+        "ECONOMY",
+        "FIRST",
+        "SECOND",
+        "ADMAIL",
+        "ARTICLES_BLIND",
+      ]),
+      size: z.enum(["STANDARD", "LARGE"]),
       maxSheets: z.number().optional(),
       deliverySLA: z.number().optional(),
       maxWeight: z.number().optional(),

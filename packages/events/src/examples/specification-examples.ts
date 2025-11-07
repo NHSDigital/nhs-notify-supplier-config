@@ -15,8 +15,15 @@ const bauStandardC5: PackSpecification = {
   version: 1,
   createdAt: "2023-01-01T00:00:00Z",
   updatedAt: "2023-01-01T00:00:00Z",
+  postage: {
+    tariff: "ECONOMY",
+    size: "STANDARD",
+    maxSheets: 6,
+    deliverySLA: 3,
+  },
   assembly: {
     envelopeId: EnvelopeId("envelope-nhs-c5-economy"),
+    printColour: "BLACK",
   },
 };
 
@@ -27,8 +34,15 @@ const bauStandardC4: PackSpecification = {
   version: 1,
   createdAt: "2023-01-01T00:00:00Z",
   updatedAt: "2023-01-01T00:00:00Z",
+  postage: {
+    tariff: "ECONOMY",
+    size: "LARGE",
+    maxSheets: 10,
+    deliverySLA: 3,
+  },
   assembly: {
     envelopeId: EnvelopeId("envelope-nhs-c4-economy"),
+    printColour: "BLACK",
   },
 };
 
@@ -39,8 +53,13 @@ const braille: PackSpecification = {
   version: 1,
   createdAt: "2023-01-01T00:00:00Z",
   updatedAt: "2023-01-01T00:00:00Z",
+  postage: {
+    tariff: "ARTICLES_BLIND",
+    size: "STANDARD",
+  },
   assembly: {
     features: ["BRAILLE"],
+    printColour: "BLACK",
   },
 };
 
@@ -51,8 +70,13 @@ const audio: PackSpecification = {
   version: 1,
   createdAt: "2023-01-01T00:00:00Z",
   updatedAt: "2023-01-01T00:00:00Z",
+  postage: {
+    tariff: "ARTICLES_BLIND",
+    size: "STANDARD",
+  },
   assembly: {
     features: ["AUDIO"],
+    printColour: "BLACK",
   },
 };
 
@@ -63,8 +87,14 @@ const sameDay: PackSpecification = {
   version: 1,
   createdAt: "2023-01-01T00:00:00Z",
   updatedAt: "2023-01-01T00:00:00Z",
+  postage: {
+    tariff: "FIRST",
+    size: "LARGE",
+    deliverySLA: 0,
+  },
   assembly: {
     envelopeId: EnvelopeId("envelope-nhs-c4-same-day"),
+    printColour: "COLOUR",
   },
 };
 
@@ -75,9 +105,15 @@ const clientPack1: PackSpecification = {
   version: 1,
   createdAt: "2023-01-01T00:00:00Z",
   updatedAt: "2023-01-01T00:00:00Z",
+  postage: {
+    tariff: "ADMAIL",
+    size: "STANDARD",
+    deliverySLA: 3,
+  },
   assembly: {
     envelopeId: EnvelopeId("client1-envelope1-c5"),
     features: ["ADMAIL"],
+    printColour: "COLOUR",
   },
 };
 
@@ -87,6 +123,7 @@ const packs = {
   braille,
   audio,
   sameDay,
+  clientPack1,
 };
 
 const variants: Record<string, LetterVariant> = {

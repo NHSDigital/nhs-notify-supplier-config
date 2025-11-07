@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { PackSpecification } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/pack-specification";
 import { packSpecificationEvents } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/events/pack-specification-events";
 import { z } from "zod";
-import { buildEventSource } from "event-builder/src/config";
+import { buildEventSource, configFromEnv } from "event-builder/src/config";
 import {
   SeverityText,
   generateTraceParent,
@@ -22,6 +22,7 @@ export type PackSpecificationSpecialisedEvent = z.infer<
 export const buildPackSpecificationEvent = (
   pack: PackSpecification,
   opts: BuildPackSpecificationEventOptions & { sequenceCounter?: number } = {},
+  config = configFromEnv(),
 ): PackSpecificationSpecialisedEvent | undefined => {
   if (pack.status === "DRAFT") return undefined; // skip drafts
   const lcStatus = pack.status.toLowerCase();
@@ -42,7 +43,7 @@ export const buildPackSpecificationEvent = (
   const baseEvent = {
     specversion: "1.0",
     id: randomUUID(),
-    source: buildEventSource(),
+    source: buildEventSource(config),
     subject: `supplier-config/pack-specification/${pack.id}`,
     type: specialised.shape.type.value,
     time: now,
@@ -56,7 +57,7 @@ export const buildPackSpecificationEvent = (
     severitynumber: severityNumber(severity),
     partitionkey: pack.id,
     sequence: opts.sequence ?? nextSequence(opts.sequenceCounter ?? 1),
-  } as unknown; // cast to unknown before schema validation
+  };
   return specialised.parse(baseEvent);
 };
 

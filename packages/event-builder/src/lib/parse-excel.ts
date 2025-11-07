@@ -55,13 +55,16 @@ function parseArray(value?: string): string[] | undefined {
   return value.split(",").map((item) => item.trim());
 }
 
-function parsePostage(
-  row: PackSpecificationRow,
-): PackSpecification["postage"] | undefined {
-  if (!(row["postage.tariff"] && row["postage.size"])) return undefined;
+// Removed legacy mapping logic; Excel must provide canonical enum values.
+function parsePostage(row: PackSpecificationRow): PackSpecification["postage"] {
+  if (!(row["postage.tariff"] && row["postage.size"])) {
+    throw new Error(
+      `Missing required postage fields (postage.tariff & postage.size) for PackSpecification id '${row.id}'`,
+    );
+  }
   const postage: PackSpecification["postage"] = {
-    tariff: row["postage.tariff"],
-    size: row["postage.size"],
+    tariff: row["postage.tariff"] as PackSpecification["postage"]["tariff"],
+    size: row["postage.size"] as PackSpecification["postage"]["size"],
   };
   if (row["postage.maxSheets"])
     postage.maxSheets = Number.parseInt(row["postage.maxSheets"], 10);
@@ -101,47 +104,50 @@ function parseAssembly(
 }
 
 function parsePackSpecification(row: PackSpecificationRow): PackSpecification {
-  const pack: Partial<PackSpecification> = {
+  const draft: Partial<PackSpecification> = {
     id: PackSpecificationId(row.id),
     name: row.name,
-    status: row.status as "DRAFT" | "PUBLISHED" | "DISABLED",
+    status: row.status as PackSpecification["status"],
     version: Number.parseInt(row.version, 10),
     createdAt: parseDate(row.createdAt),
     updatedAt: parseDate(row.updatedAt),
+    postage: parsePostage(row),
   };
-  if (row.billingId) pack.billingId = row.billingId;
-  const postage = parsePostage(row);
-  if (postage) pack.postage = postage;
+  if (row.billingId) draft.billingId = row.billingId;
   const assembly = parseAssembly(row);
-  if (assembly) pack.assembly = assembly;
-  try {
-    return $PackSpecification.parse(pack);
-  } catch (error) {
+  if (assembly) draft.assembly = assembly;
+  const parsed = $PackSpecification.safeParse(draft);
+  if (!parsed.success) {
     throw new Error(
-      `Validation failed for PackSpecification with id "${row.id}": ${error}`,
+      `Validation failed for PackSpecification '${row.id}': ${JSON.stringify(
+        parsed.error.issues,
+      )}`,
     );
   }
+  return parsed.data;
 }
 
 function parseLetterVariant(row: LetterVariantRow): LetterVariant {
   const baseIds = parseArray(row.packSpecificationIds) ?? [];
-  const variant: LetterVariant = {
+  const draft: Partial<LetterVariant> = {
     id: LetterVariantId(row.id),
     name: row.name,
     description: row.description || row.name,
-    type: row.type as "STANDARD" | "BRAILLE" | "AUDIO" | "SAME_DAY",
-    status: row.status as "DRAFT" | "PUBLISHED" | "DISABLED",
+    type: row.type as LetterVariant["type"],
+    status: row.status as LetterVariant["status"],
     packSpecificationIds: baseIds.map((id) => PackSpecificationId(id)),
   };
-  if (row.clientId) variant.clientId = row.clientId;
-  if (row.campaignIds) variant.campaignIds = parseArray(row.campaignIds);
-  try {
-    return $LetterVariant.parse(variant);
-  } catch (error) {
+  if (row.clientId) draft.clientId = row.clientId;
+  if (row.campaignIds) draft.campaignIds = parseArray(row.campaignIds);
+  const parsed = $LetterVariant.safeParse(draft);
+  if (!parsed.success) {
     throw new Error(
-      `Validation failed for LetterVariant with id "${row.id}": ${error}`,
+      `Validation failed for LetterVariant '${row.id}': ${JSON.stringify(
+        parsed.error.issues,
+      )}`,
     );
   }
+  return parsed.data;
 }
 
 export interface ParseResult {
