@@ -8,30 +8,19 @@ export type SeverityText =
   | "ERROR"
   | "FATAL";
 
+const SEVERITY_MAP: Record<SeverityText, number> = {
+  TRACE: 0,
+  DEBUG: 1,
+  INFO: 2,
+  WARN: 3,
+  ERROR: 4,
+  FATAL: 5,
+};
+
 export const severityNumber = (severity: SeverityText): number => {
-  switch (severity) {
-    case "TRACE": {
-      return 0;
-    }
-    case "DEBUG": {
-      return 1;
-    }
-    case "INFO": {
-      return 2;
-    }
-    case "WARN": {
-      return 3;
-    }
-    case "ERROR": {
-      return 4;
-    }
-    case "FATAL": {
-      return 5;
-    }
-    default: {
-      return 2;
-    } // INFO fallback
-  }
+  // eslint-disable-next-line security/detect-object-injection
+  const value = SEVERITY_MAP[severity];
+  return value ?? 2; // INFO fallback
 };
 
 export const generateTraceParent = (): string => {
@@ -42,3 +31,13 @@ export const generateTraceParent = (): string => {
 
 export const nextSequence = (counter: number): string =>
   counter.toString().padStart(20, "0");
+
+export function* newSequenceGenerator(
+  startingCounter: number,
+): Generator<string, never, undefined> {
+  let counter = startingCounter;
+  while (true) {
+    yield nextSequence(counter);
+    counter += 1;
+  }
+}

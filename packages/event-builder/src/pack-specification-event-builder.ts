@@ -6,16 +6,13 @@ import { buildEventSource, configFromEnv } from "event-builder/src/config";
 import {
   SeverityText,
   generateTraceParent,
-  nextSequence,
+  newSequenceGenerator,
   severityNumber,
 } from "event-builder/src/lib/envelope-helpers";
-import packageJson from "@nhsdigital/nhs-notify-event-schemas-supplier-config/package.json";
-
-const dataschemaversion = packageJson.version;
 
 export interface BuildPackSpecificationEventOptions {
   severity?: SeverityText;
-  sequence?: string; // optional override
+  sequence?: string | Generator<string, never, undefined>;
 }
 
 export type PackSpecificationSpecialisedEvent = z.infer<
@@ -24,7 +21,7 @@ export type PackSpecificationSpecialisedEvent = z.infer<
 
 export const buildPackSpecificationEvent = (
   pack: PackSpecification,
-  opts: BuildPackSpecificationEventOptions & { sequenceCounter?: number } = {},
+  opts: BuildPackSpecificationEventOptions = {},
   config = configFromEnv(),
 ): PackSpecificationSpecialisedEvent | undefined => {
   if (pack.status === "DRAFT") return undefined; // skip drafts
@@ -40,6 +37,7 @@ export const buildPackSpecificationEvent = (
     );
   }
   const now = new Date().toISOString();
+  const dataschemaversion = config.EVENT_DATASCHEMAVERSION;
   const dataschema = `https://notify.nhs.uk/cloudevents/schemas/supplier-config/pack-specification.${lcStatus}.${dataschemaversion}.schema.json`;
   const severity = opts.severity ?? "INFO";
   const baseEvent = {
@@ -58,7 +56,10 @@ export const buildPackSpecificationEvent = (
     severitytext: severity,
     severitynumber: severityNumber(severity),
     partitionkey: pack.id,
-    sequence: opts.sequence ?? nextSequence(opts.sequenceCounter ?? 1),
+    sequence:
+      typeof opts.sequence === "object"
+        ? opts.sequence.next().value
+        : opts.sequence,
   };
   return specialised.parse(baseEvent);
 };
@@ -67,12 +68,11 @@ export const buildPackSpecificationEvents = (
   packs: Record<string, PackSpecification>,
   startingCounter = 1,
 ): PackSpecificationSpecialisedEvent[] => {
-  let counter = startingCounter;
+  const sequenceGenerator = newSequenceGenerator(startingCounter);
+
   return Object.values(packs)
     .map((p) => {
-      const ev = buildPackSpecificationEvent(p, { sequenceCounter: counter });
-      counter += 1;
-      return ev;
+      return buildPackSpecificationEvent(p, { sequence: sequenceGenerator });
     })
     .filter((e): e is PackSpecificationSpecialisedEvent => e !== undefined);
 };

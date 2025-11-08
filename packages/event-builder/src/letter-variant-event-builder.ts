@@ -6,16 +6,13 @@ import { buildEventSource, configFromEnv } from "event-builder/src/config";
 import {
   SeverityText,
   generateTraceParent,
-  nextSequence,
+  newSequenceGenerator,
   severityNumber,
 } from "event-builder/src/lib/envelope-helpers";
-import packageJson from "@nhsdigital/nhs-notify-event-schemas-supplier-config/package.json";
-
-const dataschemaversion = packageJson.version;
 
 export interface BuildLetterVariantEventOptions {
   severity?: SeverityText;
-  sequence?: string; // optional override
+  sequence?: string | Generator<string, never, undefined>;
 }
 
 export type LetterVariantSpecialisedEvent = z.infer<
@@ -24,7 +21,7 @@ export type LetterVariantSpecialisedEvent = z.infer<
 
 export const buildLetterVariantEvent = (
   variant: LetterVariant,
-  opts: BuildLetterVariantEventOptions & { sequenceCounter?: number } = {},
+  opts: BuildLetterVariantEventOptions = {},
   config = configFromEnv(),
 ): LetterVariantSpecialisedEvent | undefined => {
   if (variant.status === "DRAFT") return undefined; // skip drafts
@@ -32,6 +29,8 @@ export const buildLetterVariantEvent = (
   const lcStatus = variant.status.toLowerCase();
   const schemaKey =
     `letter-variant.${lcStatus}` as keyof typeof letterVariantEvents;
+  // Access using controlled key constructed from validated status
+  // eslint-disable-next-line security/detect-object-injection
   const specialised = letterVariantEvents[schemaKey];
   if (!specialised) {
     throw new Error(
@@ -39,9 +38,10 @@ export const buildLetterVariantEvent = (
     );
   }
   const now = new Date().toISOString();
+  const dataschemaversion = config.EVENT_DATASCHEMAVERSION;
   const dataschema = `https://notify.nhs.uk/cloudevents/schemas/supplier-config/letter-variant.${lcStatus}.${dataschemaversion}.schema.json`;
   const severity = opts.severity ?? "INFO";
-  const baseEvent = {
+  return specialised.parse({
     specversion: "1.0",
     id: randomUUID(),
     source: buildEventSource(config),
@@ -57,24 +57,22 @@ export const buildLetterVariantEvent = (
     severitytext: severity,
     severitynumber: severityNumber(severity),
     partitionkey: variant.id,
-    sequence: opts.sequence ?? nextSequence(opts.sequenceCounter ?? 1),
-  } as unknown; // cast to unknown before schema validation
-
-  const parsed = specialised.parse(baseEvent);
-  return parsed;
+    sequence:
+      typeof opts.sequence === "object"
+        ? opts.sequence.next().value
+        : opts.sequence,
+  });
 };
 
 export const buildLetterVariantEvents = (
   variants: Record<string, LetterVariant>,
+  startingCounter = 1,
 ): LetterVariantSpecialisedEvent[] => {
-  let counter = 1;
+  const sequenceGenerator = newSequenceGenerator(startingCounter);
+
   return (
     Object.values(variants)
-      .map((v) => {
-        const ev = buildLetterVariantEvent(v, { sequenceCounter: counter });
-        counter += 1; // avoid ++ per lint rule
-        return ev;
-      })
+      .map((v) => buildLetterVariantEvent(v, { sequence: sequenceGenerator }))
       // key fields are UUIDs already validated so dynamic filtering is safe
       .filter((e): e is LetterVariantSpecialisedEvent => e !== undefined)
   );

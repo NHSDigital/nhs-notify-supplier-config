@@ -42,11 +42,8 @@ export function idRef<
   const { shape } = schema;
   const field = idFieldName ?? "id";
 
-  if (!(field in shape)) {
-    throw new Error(`ID field '${field}' not found in schema`);
-  }
-
   // Get the ID field schema
+  // eslint-disable-next-line security/detect-object-injection
   const idFieldSchema = shape[field];
   if (!idFieldSchema) {
     throw new Error(`ID field '${field}' not found in schema`);

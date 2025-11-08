@@ -3,6 +3,7 @@ import {
   buildLetterVariantEvent,
   buildLetterVariantEvents,
 } from "../letter-variant-event-builder";
+import { configFromEnv } from "../config";
 
 describe("letter-variant-event-builder", () => {
   const base: Partial<LetterVariant> = {
@@ -53,5 +54,23 @@ describe("letter-variant-event-builder", () => {
     expect(events).toHaveLength(2);
     expect(events[0].sequence).toBe("00000000000000000001");
     expect(events[1].sequence).toBe("00000000000000000002");
+  });
+
+  it("applies configured dataschema version", () => {
+    const config = { ...configFromEnv(), EVENT_DATASCHEMAVERSION: "1.999.0" };
+    const ev = buildLetterVariantEvent(
+      {
+        ...base,
+        id: "22222222-2222-2222-2222-222222222222" as any,
+        status: "PUBLISHED",
+      } as LetterVariant,
+      {},
+      config,
+    );
+    expect(ev).toBeDefined();
+    expect(ev?.dataschemaversion).toBe("1.999.0");
+    expect(ev?.dataschema).toMatch(
+      /letter-variant\.published\.1\.999\.0\.schema\.json$/,
+    );
   });
 });
