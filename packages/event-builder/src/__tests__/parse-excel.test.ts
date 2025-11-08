@@ -215,4 +215,721 @@ describe("parse-excel", () => {
     expect(pack.assembly?.insertIds).toEqual(["insert-1", "insert-2"]);
     expect(pack.assembly?.features).toEqual(["MAILMARK", "BRAILLE"]);
   });
+
+  it("thows when LetterVariant sheet is missing", () => {
+    const wb = XLSX.utils.book_new();
+    const packSheet = XLSX.utils.json_to_sheet([
+      {
+        id: "pack-1",
+        name: "Pack 1",
+        status: "PUBLISHED",
+        version: "1",
+        createdAt: "2024-01-01",
+        updatedAt: "2024-01-01",
+        "postage.id": "postage-standard",
+        "postage.size": "STANDARD",
+      },
+    ]);
+    XLSX.utils.book_append_sheet(wb, packSheet, "PackSpecification");
+    const file = writeWorkbook(wb);
+    expect(() => parseExcelFile(file)).toThrow(
+      /LetterVariant sheet not found in Excel file/,
+    );
+  });
+
+  it("thows when PackSpecification sheet is missing", () => {
+    const wb = XLSX.utils.book_new();
+    const variantSheet = XLSX.utils.json_to_sheet([
+      {
+        id: "variant-1",
+        name: "Variant 1",
+        description: "Variant 1",
+        packSpecificationIds: "pack-1,pack-2",
+        type: "STANDARD",
+        status: "PUBLISHED",
+      },
+    ]);
+    XLSX.utils.book_append_sheet(wb, variantSheet, "LetterVariant");
+    const file = writeWorkbook(wb);
+    expect(() => parseExcelFile(file)).toThrow(
+      /PackSpecification sheet not found in Excel file/,
+    );
+  });
+
+  it("throws if LetterVariant type is invalid", () => {
+    const wb = XLSX.utils.book_new();
+    const variantSheet = XLSX.utils.json_to_sheet([
+      {
+        id: "variant-1",
+        name: "Variant 1",
+        description: "Variant 1",
+        packSpecificationIds: "pack-1",
+        type: "INVALID_TYPE",
+        status: "PUBLISHED",
+      },
+    ]);
+    XLSX.utils.book_append_sheet(wb, variantSheet, "LetterVariant");
+    const packSheet = XLSX.utils.json_to_sheet([
+      {
+        id: "pack-1",
+        name: "Pack 1",
+        status: "PUBLISHED",
+        version: "1",
+        createdAt: "2024-01-01",
+        updatedAt: "2024-01-01",
+        "postage.id": "postage-standard",
+        "postage.size": "STANDARD",
+      },
+    ]);
+    XLSX.utils.book_append_sheet(wb, packSheet, "PackSpecification");
+    const file = writeWorkbook(wb);
+    expect(() => parseExcelFile(file)).toThrow(/Validation failed.*variant-1/);
+  });
+
+  it("parses optional billingId field", () => {
+    const wb = buildWorkbook({
+      packs: [
+        {
+          id: "pack-with-billing",
+          name: "Pack with Billing",
+          status: "PUBLISHED",
+          version: "1",
+          createdAt: "2024-01-01",
+          updatedAt: "2024-01-01",
+          billingId: "billing-123",
+          "postage.id": "postage-1",
+          "postage.size": "STANDARD",
+        },
+      ],
+      variants: [],
+    });
+    const file = writeWorkbook(wb);
+    const result = parseExcelFile(file);
+    expect(result.packs.packwithbilling.billingId).toBe("billing-123");
+  });
+
+  it("parses optional postage fields", () => {
+    const wb = buildWorkbook({
+      packs: [
+        {
+          id: "pack-full-postage",
+          name: "Pack with Full Postage",
+          status: "PUBLISHED",
+          version: "1",
+          createdAt: "2024-01-01",
+          updatedAt: "2024-01-01",
+          "postage.id": "postage-1",
+          "postage.size": "LARGE",
+          "postage.deliverySLA": "2",
+          "postage.maxWeight": "100.5",
+          "postage.maxThickness": "5.2",
+        },
+      ],
+      variants: [],
+    });
+    const file = writeWorkbook(wb);
+    const result = parseExcelFile(file);
+    const { postage } = result.packs.packfullpostage;
+    expect(postage.deliverySLA).toBe(2);
+    expect(postage.maxWeight).toBe(100.5);
+    expect(postage.maxThickness).toBe(5.2);
+  });
+
+  it("handles missing createdAt/updatedAt with default dates", () => {
+    const wb = buildWorkbook({
+      packs: [
+        {
+          id: "pack-no-dates",
+          name: "Pack No Dates",
+          status: "PUBLISHED",
+          version: "1",
+          "postage.id": "postage-1",
+          "postage.size": "STANDARD",
+        },
+      ],
+      variants: [],
+    });
+    const file = writeWorkbook(wb);
+    const result = parseExcelFile(file);
+    expect(result.packs.packnodates.createdAt).toBe("2023-01-01T00:00:00Z");
+    expect(result.packs.packnodates.updatedAt).toBe("2023-01-01T00:00:00Z");
+  });
+
+  it("handles invalid date strings with default date", () => {
+    const wb = buildWorkbook({
+      packs: [
+        {
+          id: "pack-invalid-dates",
+          name: "Pack Invalid Dates",
+          status: "PUBLISHED",
+          version: "1",
+          createdAt: "not-a-date",
+          updatedAt: "also-not-a-date",
+          "postage.id": "postage-1",
+          "postage.size": "STANDARD",
+        },
+      ],
+      variants: [],
+    });
+    const file = writeWorkbook(wb);
+    const result = parseExcelFile(file);
+    expect(result.packs.packinvaliddates.createdAt).toBe(
+      "2023-01-01T00:00:00Z",
+    );
+    expect(result.packs.packinvaliddates.updatedAt).toBe(
+      "2023-01-01T00:00:00Z",
+    );
+  });
+
+  it("handles empty string arrays as undefined", () => {
+    const wb = buildWorkbook({
+      packs: [
+        {
+          id: "pack-empty-arrays",
+          name: "Pack Empty Arrays",
+          status: "PUBLISHED",
+          version: "1",
+          createdAt: "2024-01-01",
+          updatedAt: "2024-01-01",
+          "postage.id": "postage-1",
+          "postage.size": "STANDARD",
+          "assembly.insertIds": "",
+          "assembly.features": "  ",
+        },
+      ],
+      variants: [],
+    });
+    const file = writeWorkbook(wb);
+    const result = parseExcelFile(file);
+    expect(result.packs.packemptyarrays.assembly?.insertIds).toBeUndefined();
+    expect(result.packs.packemptyarrays.assembly?.features).toBeUndefined();
+  });
+
+  it("parses assembly.additional as JSON", () => {
+    const wb = buildWorkbook({
+      packs: [
+        {
+          id: "pack-with-additional",
+          name: "Pack with Additional",
+          status: "PUBLISHED",
+          version: "1",
+          createdAt: "2024-01-01",
+          updatedAt: "2024-01-01",
+          "postage.id": "postage-1",
+          "postage.size": "STANDARD",
+          "assembly.additional": '{"key1":"value1","key2":"value2"}',
+        },
+      ],
+      variants: [],
+    });
+    const file = writeWorkbook(wb);
+    const result = parseExcelFile(file);
+    expect(result.packs.packwithadditional.assembly?.additional).toEqual({
+      key1: "value1",
+      key2: "value2",
+    });
+  });
+
+  it("ignores invalid JSON in assembly.additional", () => {
+    const wb = buildWorkbook({
+      packs: [
+        {
+          id: "pack-bad-json",
+          name: "Pack Bad JSON",
+          status: "PUBLISHED",
+          version: "1",
+          createdAt: "2024-01-01",
+          updatedAt: "2024-01-01",
+          "postage.id": "postage-1",
+          "postage.size": "STANDARD",
+          "assembly.additional": "not-valid-json{",
+        },
+      ],
+      variants: [],
+    });
+    const file = writeWorkbook(wb);
+    const result = parseExcelFile(file);
+    expect(result.packs.packbadjson.assembly?.additional).toBeUndefined();
+  });
+
+  it("parses paper.recycled as boolean", () => {
+    const wb = buildWorkbook({
+      packs: [
+        {
+          id: "pack-recycled-true",
+          name: "Pack Recycled True",
+          status: "PUBLISHED",
+          version: "1",
+          createdAt: "2024-01-01",
+          updatedAt: "2024-01-01",
+          "postage.id": "postage-1",
+          "postage.size": "STANDARD",
+          "assembly.paper.id": "paper-1",
+          "assembly.paper.name": "Recycled Paper",
+          "assembly.paper.size": "A4",
+          "assembly.paper.colour": "WHITE",
+          "assembly.paper.recycled": "TRUE",
+        },
+        {
+          id: "pack-recycled-false",
+          name: "Pack Recycled False",
+          status: "PUBLISHED",
+          version: "1",
+          createdAt: "2024-01-01",
+          updatedAt: "2024-01-01",
+          "postage.id": "postage-2",
+          "postage.size": "LARGE",
+          "assembly.paper.id": "paper-2",
+          "assembly.paper.name": "Non-Recycled Paper",
+          "assembly.paper.size": "A3",
+          "assembly.paper.colour": "COLOURED",
+          "assembly.paper.recycled": "false",
+        },
+      ],
+      variants: [],
+    });
+    const file = writeWorkbook(wb);
+    const result = parseExcelFile(file);
+    expect(result.packs.packrecycledtrue.assembly?.paper?.recycled).toBe(true);
+    expect(result.packs.packrecycledfalse.assembly?.paper?.recycled).toBe(
+      false,
+    );
+  });
+
+  it("uses default weightGSM when not provided", () => {
+    const wb = buildWorkbook({
+      packs: [
+        {
+          id: "pack-default-gsm",
+          name: "Pack Default GSM",
+          status: "PUBLISHED",
+          version: "1",
+          createdAt: "2024-01-01",
+          updatedAt: "2024-01-01",
+          "postage.id": "postage-1",
+          "postage.size": "STANDARD",
+          "assembly.paper.id": "paper-1",
+          "assembly.paper.size": "A4",
+          "assembly.paper.colour": "WHITE",
+          "assembly.paper.recycled": "false",
+        },
+      ],
+      variants: [],
+    });
+    const file = writeWorkbook(wb);
+    const result = parseExcelFile(file);
+    expect(result.packs.packdefaultgsm.assembly?.paper?.weightGSM).toBe(80);
+  });
+
+  it("parses LetterVariant with optional clientId and campaignIds", () => {
+    const wb = buildWorkbook({
+      packs: [
+        {
+          id: "pack-1",
+          name: "Pack 1",
+          status: "PUBLISHED",
+          version: "1",
+          createdAt: "2024-01-01",
+          updatedAt: "2024-01-01",
+          "postage.id": "postage-1",
+          "postage.size": "STANDARD",
+        },
+      ],
+      variants: [
+        {
+          id: "variant-with-ids",
+          name: "Variant with IDs",
+          description: "Test variant",
+          packSpecificationIds: "pack-1",
+          type: "STANDARD",
+          status: "PUBLISHED",
+          clientId: "client-123",
+          campaignIds: "campaign-1,campaign-2,campaign-3",
+        },
+      ],
+    });
+    const file = writeWorkbook(wb);
+    const result = parseExcelFile(file);
+    expect(result.variants.variantwithids.clientId).toBe("client-123");
+    expect(result.variants.variantwithids.campaignIds).toEqual([
+      "campaign-1",
+      "campaign-2",
+      "campaign-3",
+    ]);
+  });
+
+  it("uses name as description when description is missing", () => {
+    const wb = buildWorkbook({
+      packs: [
+        {
+          id: "pack-1",
+          name: "Pack 1",
+          status: "PUBLISHED",
+          version: "1",
+          createdAt: "2024-01-01",
+          updatedAt: "2024-01-01",
+          "postage.id": "postage-1",
+          "postage.size": "STANDARD",
+        },
+      ],
+      variants: [
+        {
+          id: "variant-no-desc",
+          name: "My Variant Name",
+          packSpecificationIds: "pack-1",
+          type: "STANDARD",
+          status: "PUBLISHED",
+        },
+      ],
+    });
+    const file = writeWorkbook(wb);
+    const result = parseExcelFile(file);
+    expect(result.variants.variantnodesc.description).toBe("My Variant Name");
+  });
+
+  it("throws on empty packSpecificationIds", () => {
+    const wb = buildWorkbook({
+      packs: [
+        {
+          id: "pack-1",
+          name: "Pack 1",
+          status: "PUBLISHED",
+          version: "1",
+          createdAt: "2024-01-01",
+          updatedAt: "2024-01-01",
+          "postage.id": "postage-1",
+          "postage.size": "STANDARD",
+        },
+      ],
+      variants: [
+        {
+          id: "variant-no-packs",
+          name: "Variant No Packs",
+          description: "Test",
+          packSpecificationIds: "",
+          type: "STANDARD",
+          status: "PUBLISHED",
+        },
+      ],
+    });
+    const file = writeWorkbook(wb);
+    expect(() => parseExcelFile(file)).toThrow(
+      /Validation failed.*variant-no-packs/,
+    );
+  });
+
+  it("sanitizes IDs by removing non-alphanumeric characters", () => {
+    const wb = buildWorkbook({
+      packs: [
+        {
+          id: "pack-with-dashes-123",
+          name: "Pack with Dashes",
+          status: "PUBLISHED",
+          version: "1",
+          createdAt: "2024-01-01",
+          updatedAt: "2024-01-01",
+          "postage.id": "postage-1",
+          "postage.size": "STANDARD",
+        },
+      ],
+      variants: [
+        {
+          id: "variant_with_underscores_456",
+          name: "Variant with Underscores",
+          packSpecificationIds: "pack-with-dashes-123",
+          type: "STANDARD",
+          status: "PUBLISHED",
+        },
+      ],
+    });
+    const file = writeWorkbook(wb);
+    const result = parseExcelFile(file);
+    expect(result.packs.packwithdashes123).toBeDefined();
+    expect(result.variants.variantwithunderscores456).toBeDefined();
+  });
+
+  it("handles partial constraints - only maxSheets", () => {
+    const wb = buildWorkbook({
+      packs: [
+        {
+          id: "pack-partial-1",
+          name: "Pack Partial 1",
+          status: "PUBLISHED",
+          version: "1",
+          createdAt: "2024-01-01",
+          updatedAt: "2024-01-01",
+          "postage.id": "postage-1",
+          "postage.size": "STANDARD",
+          "constraints.maxSheets": "15",
+        },
+      ],
+      variants: [],
+    });
+    const file = writeWorkbook(wb);
+    const result = parseExcelFile(file);
+    expect(result.packs.packpartial1.constraints).toEqual({
+      maxSheets: 15,
+    });
+  });
+
+  it("handles partial constraints - only deliverySLA", () => {
+    const wb = buildWorkbook({
+      packs: [
+        {
+          id: "pack-partial-2",
+          name: "Pack Partial 2",
+          status: "PUBLISHED",
+          version: "1",
+          createdAt: "2024-01-01",
+          updatedAt: "2024-01-01",
+          "postage.id": "postage-1",
+          "postage.size": "STANDARD",
+          "constraints.deliverySLA": "7",
+        },
+      ],
+      variants: [],
+    });
+    const file = writeWorkbook(wb);
+    const result = parseExcelFile(file);
+    expect(result.packs.packpartial2.constraints).toEqual({
+      deliverySLA: 7,
+    });
+  });
+
+  it("handles partial constraints - only coverage percentages", () => {
+    const wb = buildWorkbook({
+      packs: [
+        {
+          id: "pack-partial-3",
+          name: "Pack Partial 3",
+          status: "PUBLISHED",
+          version: "1",
+          createdAt: "2024-01-01",
+          updatedAt: "2024-01-01",
+          "postage.id": "postage-1",
+          "postage.size": "STANDARD",
+          "constraints.blackCoveragePercentage": "90.5",
+          "constraints.colourCoveragePercentage": "60.25",
+        },
+      ],
+      variants: [],
+    });
+    const file = writeWorkbook(wb);
+    const result = parseExcelFile(file);
+    expect(result.packs.packpartial3.constraints).toEqual({
+      blackCoveragePercentage: 90.5,
+      colourCoveragePercentage: 60.25,
+    });
+  });
+
+  it("parses assembly with only envelopeId", () => {
+    const wb = buildWorkbook({
+      packs: [
+        {
+          id: "pack-envelope-only",
+          name: "Pack Envelope Only",
+          status: "PUBLISHED",
+          version: "1",
+          createdAt: "2024-01-01",
+          updatedAt: "2024-01-01",
+          "postage.id": "postage-1",
+          "postage.size": "STANDARD",
+          "assembly.envelopeId": "envelope-123",
+        },
+      ],
+      variants: [],
+    });
+    const file = writeWorkbook(wb);
+    const result = parseExcelFile(file);
+    expect(result.packs.packenvelopeonly.assembly).toEqual({
+      envelopeId: "envelope-123",
+    });
+  });
+
+  it("parses assembly with only printColour", () => {
+    const wb = buildWorkbook({
+      packs: [
+        {
+          id: "pack-print-only",
+          name: "Pack Print Only",
+          status: "PUBLISHED",
+          version: "1",
+          createdAt: "2024-01-01",
+          updatedAt: "2024-01-01",
+          "postage.id": "postage-1",
+          "postage.size": "STANDARD",
+          "assembly.printColour": "BLACK",
+        },
+      ],
+      variants: [],
+    });
+    const file = writeWorkbook(wb);
+    const result = parseExcelFile(file);
+    expect(result.packs.packprintonly.assembly).toEqual({
+      printColour: "BLACK",
+    });
+  });
+
+  it("throws when postage.id is missing but postage.size is present", () => {
+    const wb = buildWorkbook({
+      packs: [
+        {
+          id: "pack-missing-id",
+          name: "Pack Missing ID",
+          status: "PUBLISHED",
+          version: "1",
+          createdAt: "2024-01-01",
+          updatedAt: "2024-01-01",
+          "postage.size": "STANDARD",
+        },
+      ],
+      variants: [],
+    });
+    const file = writeWorkbook(wb);
+    expect(() => parseExcelFile(file)).toThrow(
+      /Missing required postage fields.*pack-missing-id/,
+    );
+  });
+
+  it("throws when postage.size is missing but postage.id is present", () => {
+    const wb = buildWorkbook({
+      packs: [
+        {
+          id: "pack-missing-size",
+          name: "Pack Missing Size",
+          status: "PUBLISHED",
+          version: "1",
+          createdAt: "2024-01-01",
+          updatedAt: "2024-01-01",
+          "postage.id": "postage-1",
+        },
+      ],
+      variants: [],
+    });
+    const file = writeWorkbook(wb);
+    expect(() => parseExcelFile(file)).toThrow(
+      /Missing required postage fields.*pack-missing-size/,
+    );
+  });
+
+  it("handles all assembly fields together", () => {
+    const wb = buildWorkbook({
+      packs: [
+        {
+          id: "pack-full-assembly",
+          name: "Pack Full Assembly",
+          status: "PUBLISHED",
+          version: "1",
+          createdAt: "2024-01-01",
+          updatedAt: "2024-01-01",
+          "postage.id": "postage-1",
+          "postage.size": "STANDARD",
+          "assembly.envelopeId": "env-1",
+          "assembly.printColour": "COLOUR",
+          "assembly.paper.id": "paper-1",
+          "assembly.paper.name": "Premium",
+          "assembly.paper.weightGSM": "100",
+          "assembly.paper.size": "A3",
+          "assembly.paper.colour": "COLOURED",
+          "assembly.paper.recycled": "true",
+          "assembly.insertIds": "insert-a,insert-b",
+          "assembly.features": "MAILMARK,AUDIO,ADMAIL",
+          "assembly.additional": '{"note":"test"}',
+        },
+      ],
+      variants: [],
+    });
+    const file = writeWorkbook(wb);
+    const result = parseExcelFile(file);
+    const { assembly } = result.packs.packfullassembly;
+    expect(assembly?.envelopeId).toBe("env-1");
+    expect(assembly?.printColour).toBe("COLOUR");
+    expect(assembly?.paper?.id).toBe("paper-1");
+    expect(assembly?.insertIds).toEqual(["insert-a", "insert-b"]);
+    expect(assembly?.features).toEqual(["MAILMARK", "AUDIO", "ADMAIL"]);
+    expect(assembly?.additional).toEqual({ note: "test" });
+  });
+
+  it("parses arrays with whitespace correctly", () => {
+    const wb = buildWorkbook({
+      packs: [
+        {
+          id: "pack-whitespace-arrays",
+          name: "Pack Whitespace Arrays",
+          status: "PUBLISHED",
+          version: "1",
+          createdAt: "2024-01-01",
+          updatedAt: "2024-01-01",
+          "postage.id": "postage-1",
+          "postage.size": "STANDARD",
+          "assembly.insertIds": " insert-1 , insert-2 , insert-3 ",
+          "assembly.features": " MAILMARK , BRAILLE ",
+        },
+      ],
+      variants: [],
+    });
+    const file = writeWorkbook(wb);
+    const result = parseExcelFile(file);
+    expect(result.packs.packwhitespacearrays.assembly?.insertIds).toEqual([
+      "insert-1",
+      "insert-2",
+      "insert-3",
+    ]);
+    expect(result.packs.packwhitespacearrays.assembly?.features).toEqual([
+      "MAILMARK",
+      "BRAILLE",
+    ]);
+  });
+
+  it("handles empty insertIds but valid features", () => {
+    const wb = buildWorkbook({
+      packs: [
+        {
+          id: "pack-empty-inserts",
+          name: "Pack Empty Inserts",
+          status: "PUBLISHED",
+          version: "1",
+          createdAt: "2024-01-01",
+          updatedAt: "2024-01-01",
+          "postage.id": "postage-1",
+          "postage.size": "STANDARD",
+          "assembly.insertIds": "  ",
+          "assembly.features": "MAILMARK",
+        },
+      ],
+      variants: [],
+    });
+    const file = writeWorkbook(wb);
+    const result = parseExcelFile(file);
+    expect(result.packs.packemptyinserts.assembly?.insertIds).toBeUndefined();
+    expect(result.packs.packemptyinserts.assembly?.features).toEqual([
+      "MAILMARK",
+    ]);
+  });
+
+  it("handles valid insertIds but empty features", () => {
+    const wb = buildWorkbook({
+      packs: [
+        {
+          id: "pack-empty-features",
+          name: "Pack Empty Features",
+          status: "PUBLISHED",
+          version: "1",
+          createdAt: "2024-01-01",
+          updatedAt: "2024-01-01",
+          "postage.id": "postage-1",
+          "postage.size": "STANDARD",
+          "assembly.insertIds": "insert-1",
+          "assembly.features": "  ",
+        },
+      ],
+      variants: [],
+    });
+    const file = writeWorkbook(wb);
+    const result = parseExcelFile(file);
+    expect(result.packs.packemptyfeatures.assembly?.insertIds).toEqual([
+      "insert-1",
+    ]);
+    expect(result.packs.packemptyfeatures.assembly?.features).toBeUndefined();
+  });
 });

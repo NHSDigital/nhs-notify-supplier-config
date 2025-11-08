@@ -170,7 +170,7 @@ function parseAssembly(
 
   if (row["assembly.insertIds"]) {
     const insertIds = parseArray(row["assembly.insertIds"]);
-    if (insertIds && insertIds.length > 0) {
+    if (insertIds) {
       assembly.insertIds = insertIds as InsertId[];
       hasAssembly = true;
     }
@@ -178,7 +178,7 @@ function parseAssembly(
 
   if (row["assembly.features"]) {
     const features = parseArray(row["assembly.features"]);
-    if (features && features.length > 0) {
+    if (features) {
       assembly.features = features as (
         | "MAILMARK"
         | "BRAILLE"
