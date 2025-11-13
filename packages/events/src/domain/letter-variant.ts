@@ -2,26 +2,19 @@ import { ConfigBase } from "@nhsdigital/nhs-notify-event-schemas-supplier-config
 import { idRef } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/helpers/id-ref";
 import {
   $Constraints,
-  $PackSpecification
+  $PackSpecification,
 } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/pack-specification";
 import { z } from "zod";
 import { $Contract } from "./contract";
 
-export const $LetterType = z.enum([
-  "STANDARD",
-  "BRAILLE",
-  "AUDIO",
-  "SAME_DAY",
-]);
-
-export const $LetterVariantStatus = z.enum(["DRAFT", "PUBLISHED", "DISABLED"]);
+export const $LetterType = z.enum(["STANDARD", "BRAILLE", "AUDIO", "SAME_DAY"]);
 
 export const $LetterVariant = ConfigBase("LetterVariant")
   .extend({
     name: z.string(),
     description: z.string().optional(),
     type: $LetterType,
-    status: $LetterVariantStatus,
+    status: z.enum(["DRAFT", "PUBLISHED", "DISABLED"]),
     contractId: idRef($Contract),
     clientId: z.string().optional(),
     campaignIds: z.array(z.string()).optional(),
@@ -32,6 +25,9 @@ export const $LetterVariant = ConfigBase("LetterVariant")
         "Constraints that apply to this letter variant, aggregating those in the pack specifications where specified.",
     }),
   })
-  .describe("LetterVariant");
+  .meta({
+    title: "LetterVariant",
+    description: `A Letter Variant describes a letter that can be produced with particular characteristics, and may be scoped to a single clientId and campaignId.`,
+  });
 export type LetterVariant = z.infer<typeof $LetterVariant>;
 export const LetterVariantId = $LetterVariant.shape.id.parse;

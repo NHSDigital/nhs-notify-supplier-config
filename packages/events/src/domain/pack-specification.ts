@@ -83,6 +83,10 @@ export const $PackSpecification = ConfigBase("PackSpecification")
       .partial()
       .optional(),
   })
-  .describe("PackSpecification");
+  .meta({
+    title: "PackSpecification",
+    description:
+      "A PackSpecification defines the composition, postage and assembly attributes for producing a pack.",
+  });
 export type PackSpecification = z.infer<typeof $PackSpecification>;
 export const PackSpecificationId = $PackSpecification.shape.id.parse;

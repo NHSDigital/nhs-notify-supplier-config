@@ -8,7 +8,7 @@ export const $SupplierPack = ConfigBase("SupplierPack")
   .extend({
     packSpecificationId: idRef($PackSpecification),
     supplierId: idRef($ChannelSupplier),
-    status: z.enum(["SUBMITTED", "APPROVED", "REJECTED", "DEPRECATED"]).meta({
+    status: z.enum(["SUBMITTED", "APPROVED", "REJECTED", "DISABLED"]).meta({
       title: "SupplierPackStatus",
       description:
         "Indicates the current state of the supplier pack approval process.",

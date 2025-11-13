@@ -77,7 +77,7 @@ export const $EnvelopeProfile = z
         ],
       }),
     ),
-    data: z.record(z.string(), z.unknown()).meta({
+    data: z.any().meta({
       title: "Event Data",
       description: "Container object wrapping the structured Notify payload.",
       examples: [

@@ -13,6 +13,7 @@ export const $SupplierAllocation = ConfigBase("SupplierAllocation")
   })
   .meta({
     title: "SupplierAllocation",
-    description: "Supplier Allocation configuration schema",
+    description:
+      "A SupplierAllocation defines the proportion of the volume associated with a contract which should be processed using a specific supplier.",
   });
 export type SupplierAllocation = z.infer<typeof $SupplierAllocation>;

@@ -15,68 +15,92 @@ import {
   $PackSpecificationEvent,
   packSpecificationEvents,
 } from "../events/pack-specification-events";
+import {
+  $SupplierAllocationEvent,
+  supplierAllocationEvents,
+} from "../events/supplier-allocation-events";
+import {
+  $SupplierPackEvent,
+  supplierPackEvents,
+} from "../events/supplier-pack-events";
 
-for (const [key, schema] of Object.entries({
+/**
+ * Generate JSON schema for a single Zod schema and write to file
+ */
+function generateJsonSchema(
+  schema: z.ZodTypeAny,
+  outputPath: string,
+  schemaName: string,
+): void {
+  const jsonSchema = z.toJSONSchema(schema, {
+    io: "input",
+    target: "openapi-3.0",
+    reused: "ref",
+  });
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  fs.writeFileSync(outputPath, JSON.stringify(jsonSchema, null, 2));
+  console.info(`Wrote JSON schema for ${schemaName} to ${outputPath}`);
+}
+
+/**
+ * Generate JSON schemas for domain models
+ */
+function generateDomainSchemas(
+  domainModels: Record<string, z.ZodTypeAny>,
+) {
+  fs.mkdirSync("schemas/domain", { recursive: true });
+  for (const [key, schema] of Object.entries(domainModels)) {
+    const outFile = `schemas/domain/${key}.schema.json`;
+    generateJsonSchema(schema, outFile, key);
+  }
+}
+
+/**
+ * Generate JSON schemas for event types
+ */
+function generateEventSchemas(
+  eventSchemas: Record<string, z.ZodTypeAny>,
+) {
+  fs.mkdirSync("schemas/events", { recursive: true });
+  for (const [key, schema] of Object.entries(eventSchemas)) {
+    const outFile = `schemas/events/${key}.schema.json`;
+    generateJsonSchema(schema, outFile, key);
+  }
+}
+
+/**
+ * Generate a generic "any" event schema that matches any status for a given event type
+ */
+function generateAnyEventSchema(
+  schema: z.ZodTypeAny,
+  eventTypeName: string,
+){
+  fs.mkdirSync("schemas/events", { recursive: true });
+  const outFile = `schemas/events/${eventTypeName}.any.schema.json`;
+  generateJsonSchema(schema, outFile, `${eventTypeName}.any`);
+}
+
+// Generate domain schemas
+generateDomainSchemas({
   "letter-variant": $LetterVariant,
   "pack-specification": $PackSpecification,
   "supplier-pack": $SupplierPack,
   contract: $Contract,
   "supplier-allocation": $SupplierAllocation,
-})) {
-  const jsonSchema = z.toJSONSchema(schema, {
-    io: "input",
-    target: "openapi-3.0",
-    reused: "ref",
-  });
-  fs.mkdirSync("schemas/domain", { recursive: true });
-  const outFile = `schemas/domain/${key}.schema.json`;
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
-  fs.writeFileSync(outFile, JSON.stringify(jsonSchema, null, 2));
-  console.info(`Wrote JSON schema for ${key} to ${outFile}`);
-}
-
-for (const [key, schema] of Object.entries(letterVariantEvents)) {
-  const jsonSchema = z.toJSONSchema(schema, {
-    io: "input",
-    target: "openapi-3.0",
-    reused: "ref",
-  });
-  fs.mkdirSync("schemas/events", { recursive: true });
-  const outFile = `schemas/events/${key}.schema.json`;
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
-  fs.writeFileSync(outFile, JSON.stringify(jsonSchema, null, 2));
-  console.info(`Wrote JSON schema for ${key} to ${outFile}`);
-}
-
-const letterAnySchema = z.toJSONSchema($LetterVariantEvent, {
-  io: "input",
-  target: "openapi-3.0",
-  reused: "ref",
 });
-fs.mkdirSync("schemas/events", { recursive: true });
-const letterAnyFile = `schemas/events/letter-variant.any.schema.json`;
-fs.writeFileSync(letterAnyFile, JSON.stringify(letterAnySchema, null, 2));
-console.info(`Wrote JSON schema for letter-variant.any to ${letterAnyFile}`);
 
-for (const [key, schema] of Object.entries(packSpecificationEvents)) {
-  const jsonSchema = z.toJSONSchema(schema, {
-    io: "input",
-    target: "openapi-3.0",
-    reused: "ref",
-  });
-  fs.mkdirSync("schemas/events", { recursive: true });
-  const outFile = `schemas/events/${key}.schema.json`;
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
-  fs.writeFileSync(outFile, JSON.stringify(jsonSchema, null, 2));
-  console.info(`Wrote JSON schema for ${key} to ${outFile}`);
-}
+// Generate event schemas for letter variants
+generateEventSchemas(letterVariantEvents);
+generateAnyEventSchema($LetterVariantEvent, "letter-variant");
 
-const packAnySchema = z.toJSONSchema($PackSpecificationEvent, {
-  io: "input",
-  target: "openapi-3.0",
-  reused: "ref",
-});
-fs.mkdirSync("schemas/events", { recursive: true });
-const packAnyFile = `schemas/events/pack-specification.any.schema.json`;
-fs.writeFileSync(packAnyFile, JSON.stringify(packAnySchema, null, 2));
-console.info(`Wrote JSON schema for pack-specification.any to ${packAnyFile}`);
+// Generate event schemas for pack specifications
+generateEventSchemas(packSpecificationEvents);
+generateAnyEventSchema($PackSpecificationEvent, "pack-specification");
+
+// Generate event schemas for supplier allocations
+generateEventSchemas(supplierAllocationEvents);
+generateAnyEventSchema($SupplierAllocationEvent, "supplier-allocation");
+
+// Generate event schemas for supplier packs
+generateEventSchemas(supplierPackEvents);
+generateAnyEventSchema($SupplierPackEvent, "supplier-pack");
