@@ -1,6 +1,6 @@
 {
   "title": "SupplierAllocation",
-  "description": "Supplier Allocation configuration schema",
+  "description": "A SupplierAllocation defines the proportion of the volume associated with a contract which should be processed using a specific supplier.",
   "type": "object",
   "properties": {
     "id": {

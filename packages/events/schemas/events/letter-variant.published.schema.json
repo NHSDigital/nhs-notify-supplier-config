@@ -25,6 +25,32 @@
       "format": "uuid",
       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
     },
+    "type": {
+      "title": "letter-variant.published event type",
+      "description": "Event type using reverse-DNS style",
+      "examples": [
+        "uk.nhs.notify.supplier-config.letter-variant.published.v1"
+      ],
+      "type": "string",
+      "enum": [
+        "uk.nhs.notify.supplier-config.letter-variant.published.v1"
+      ]
+    },
+    "dataschema": {
+      "title": "Data Schema URI",
+      "description": "URI of a schema that describes the event data\n\nData schema version must match the major version indicated by the type",
+      "examples": [
+        "https://notify.nhs.uk/cloudevents/schemas/supplier-config/letter-variant.published.1.0.0.schema.json"
+      ],
+      "type": "string",
+      "pattern": "^https:\\/\\/notify\\.nhs\\.uk\\/cloudevents\\/schemas\\/supplier-config\\/letter-variant\\.(?<status>published)\\.1\\.\\d+\\.\\d+\\.schema.json$"
+    },
+    "dataschemaversion": {
+      "title": "Data Schema Version",
+      "description": "Matches semantic versioning format with fixed major version (Not part of cloudevents spec?)",
+      "type": "string",
+      "pattern": "^1\\.\\d+\\.\\d+$"
+    },
     "source": {
       "title": "Event Source",
       "description": "Logical event producer path within the supplier-config domain",
@@ -35,55 +61,13 @@
       "title": "Event Subject",
       "description": "Resource path (no leading slash) within the source made of segments separated by '/'.",
       "examples": [
-        "supplier-config/letter-variant/f47ac10b-58cc-4372-a567-0e02b2c3d479"
+        "supplier-config/pack-specification/f47ac10b-58cc-4372-a567-0e02b2c3d479"
       ],
       "type": "string",
-      "pattern": "^supplier-config\\/letter-variant\\/[a-z0-9-]+"
-    },
-    "type": {
-      "title": "LetterVariant PUBLISHED event type",
-      "description": "Event type using reverse-DNS style",
-      "examples": [
-        "uk.nhs.notify.supplier-config.letter-variant.published.v1"
-      ],
-      "type": "string",
-      "enum": [
-        "uk.nhs.notify.supplier-config.letter-variant.published.v1"
-      ]
-    },
-    "time": {
-      "title": "Event Time",
-      "description": "Timestamp when the event occurred (RFC 3339).",
-      "examples": [
-        "2025-10-01T10:15:30.000Z"
-      ],
-      "type": "string",
-      "format": "date-time",
-      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
-    },
-    "datacontenttype": {
-      "title": "Data Content Type",
-      "description": "Media type for the data field (fixed to application/json).",
-      "examples": [
-        "application/json"
-      ],
-      "type": "string",
-      "enum": [
-        "application/json"
-      ]
-    },
-    "dataschema": {
-      "title": "Data Schema URI",
-      "description": "URI of a schema that describes the event data\n\nData schema version must match the major version indicated by the type",
-      "examples": [
-        "https://notify.nhs.uk/cloudevents/schemas/supplier-config/letter-variant.published.1.0.0.schema.json"
-      ],
-      "type": "string",
-      "pattern": "^https:\\/\\/notify\\.nhs\\.uk\\/cloudevents\\/schemas\\/supplier-config\\/letter-variant.published.1\\.\\d+\\.\\d+\\.schema.json$"
+      "pattern": "\\/supplier-config\\/letter-variant\\/[a-z0-9-]+$"
     },
     "data": {
-      "title": "Letter Variant",
-      "description": "A Letter Variant describes a letter that can be produced with particular characteristics, and may be scoped to a single clientId and campaignId.\n\nFor this event the status is always `PUBLISHED`",
+      "description": "The status of a LetterVariant indicates whether it is available for use.\n\nFor this event the status is always `PUBLISHED`",
       "type": "object",
       "properties": {
         "id": {
@@ -128,8 +112,8 @@
           "minItems": 1,
           "type": "array",
           "items": {
-            "title": "PackSpecification ID Reference",
-            "description": "Reference to a PackSpecification by its unique identifier",
+            "title": "A PackSpecification defines the composition, postage and assembly attributes for producing a pack. ID Reference",
+            "description": "Reference to a A PackSpecification defines the composition, postage and assembly attributes for producing a pack. by its unique identifier",
             "type": "string"
           }
         },
@@ -160,6 +144,27 @@
         "status",
         "contractId",
         "packSpecificationIds"
+      ]
+    },
+    "time": {
+      "title": "Event Time",
+      "description": "Timestamp when the event occurred (RFC 3339).",
+      "examples": [
+        "2025-10-01T10:15:30.000Z"
+      ],
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+    },
+    "datacontenttype": {
+      "title": "Data Content Type",
+      "description": "Media type for the data field (fixed to application/json).",
+      "examples": [
+        "application/json"
+      ],
+      "type": "string",
+      "enum": [
+        "application/json"
       ]
     },
     "traceparent": {
@@ -289,26 +294,20 @@
         "sensitive",
         "special-category"
       ]
-    },
-    "dataschemaversion": {
-      "title": "Data Schema Version",
-      "description": "Matches semantic versioning format with fixed major version (Not part of cloudevents spec?)",
-      "type": "string",
-      "pattern": "^1\\.\\d+\\.\\d+$"
     }
   },
   "required": [
     "specversion",
     "id",
+    "type",
+    "dataschema",
+    "dataschemaversion",
     "source",
     "subject",
-    "type",
-    "time",
-    "dataschema",
     "data",
+    "time",
     "traceparent",
     "recordedtime",
-    "severitynumber",
-    "dataschemaversion"
+    "severitynumber"
   ]
 }

@@ -1,6 +1,6 @@
-import { z } from "zod/index";
+import { z } from "zod";
 import { $SupplierAllocation, SupplierAllocation } from "../domain";
-import { SupplierConfigEnvelope } from "./supplier-config-envelope";
+import { EventEnvelope } from "./event-envelope";
 
 const allocationStatuses = [
   "PUBLISHED",
@@ -10,7 +10,7 @@ const allocationStatuses = [
 /**
  * Generic schema for parsing any SupplierAllocation status change event
  */
-export const $SupplierAllocationEvent = SupplierConfigEnvelope(
+export const $SupplierAllocationEvent = EventEnvelope(
   "supplier-allocation",
   "supplier-allocation",
   $SupplierAllocation,
@@ -28,7 +28,7 @@ function specialiseSupplierAllocationEvent(
   status: (typeof allocationStatuses)[number],
 ) {
   const lcStatus = status.toLowerCase();
-  return SupplierConfigEnvelope(
+  return EventEnvelope(
     `supplier-allocation.${lcStatus}`,
     "supplier-allocation",
     $SupplierAllocation

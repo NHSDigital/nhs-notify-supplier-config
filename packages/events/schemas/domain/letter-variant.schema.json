@@ -1,5 +1,6 @@
 {
-  "description": "LetterVariant",
+  "title": "LetterVariant",
+  "description": "A Letter Variant describes a letter that can be produced with particular characteristics, and may be scoped to a single clientId and campaignId.",
   "type": "object",
   "properties": {
     "id": {
@@ -46,8 +47,8 @@
       "minItems": 1,
       "type": "array",
       "items": {
-        "title": "PackSpecification ID Reference",
-        "description": "Reference to a PackSpecification by its unique identifier",
+        "title": "A PackSpecification defines the composition, postage and assembly attributes for producing a pack. ID Reference",
+        "description": "Reference to a A PackSpecification defines the composition, postage and assembly attributes for producing a pack. by its unique identifier",
         "type": "string"
       }
     },

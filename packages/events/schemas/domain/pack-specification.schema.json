@@ -1,5 +1,6 @@
 {
-  "description": "PackSpecification",
+  "title": "PackSpecification",
+  "description": "A PackSpecification defines the composition, postage and assembly attributes for producing a pack.",
   "type": "object",
   "properties": {
     "id": {

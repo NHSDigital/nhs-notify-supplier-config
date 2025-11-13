@@ -3,7 +3,7 @@ import {
   $LetterVariant,
   LetterVariant,
 } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/letter-variant";
-import {SupplierConfigEnvelope} from "./supplier-config-envelope";
+import { EventEnvelope } from "./event-envelope";
 
 const variantStatuses = [
   "PUBLISHED",
@@ -13,12 +13,15 @@ const variantStatuses = [
 /**
  * A generic schema for parsing any letter status change event
  */
-export const $LetterVariantEvent =
-  SupplierConfigEnvelope("letter-variant", "letter-variant", $LetterVariant, variantStatuses)
-  .meta({
-    title: `letter-variant.* Event`,
-    description: `Generic event schema for letter variant changes`,
-  });
+export const $LetterVariantEvent = EventEnvelope(
+  "letter-variant",
+  "letter-variant",
+  $LetterVariant,
+  variantStatuses,
+).meta({
+  title: `letter-variant.* Event`,
+  description: `Generic event schema for letter variant changes`,
+});
 
 export type LetterVariantEvent = z.infer<typeof $LetterVariantEvent>;
 
@@ -27,16 +30,18 @@ export type LetterVariantEvent = z.infer<typeof $LetterVariantEvent>;
  * @param status
  */
 const specialiseLetterVariantEvent = (status: LetterVariant["status"]) => {
-  return SupplierConfigEnvelope(
+  return EventEnvelope(
     `letter-variant.${status.toLowerCase()}`,
     "letter-variant",
-    $LetterVariant.extend({
-      status: z.literal(status),
-    }).meta({
-      description: `The status of a LetterVariant indicates whether it is available for use.
+    $LetterVariant
+      .extend({
+        status: z.literal(status),
+      })
+      .meta({
+        description: `The status of a LetterVariant indicates whether it is available for use.
 
 For this event the status is always \`${status}\``,
-    }),
+      }),
     [status],
   ).meta({
     title: `letter-variant.${status.toLowerCase()} Event`,

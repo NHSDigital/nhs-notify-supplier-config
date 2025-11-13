@@ -7,8 +7,8 @@
       "type": "string"
     },
     "packSpecificationId": {
-      "title": "PackSpecification ID Reference",
-      "description": "Reference to a PackSpecification by its unique identifier",
+      "title": "A PackSpecification defines the composition, postage and assembly attributes for producing a pack. ID Reference",
+      "description": "Reference to a A PackSpecification defines the composition, postage and assembly attributes for producing a pack. by its unique identifier",
       "type": "string"
     },
     "supplierId": {
@@ -24,7 +24,7 @@
         "SUBMITTED",
         "APPROVED",
         "REJECTED",
-        "DEPRECATED"
+        "DISABLED"
       ]
     }
   },

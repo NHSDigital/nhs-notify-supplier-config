@@ -2,7 +2,8 @@ import {
   $PackSpecification,
   PackSpecification,
 } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/pack-specification";
-import {SupplierConfigEnvelope} from "./supplier-config-envelope";
+import { z } from "zod";
+import { EventEnvelope } from "./event-envelope";
 
 const packStatuses = [
   "PUBLISHED",
@@ -12,7 +13,7 @@ const packStatuses = [
 /**
  * Generic schema for parsing any PackSpecification status change event
  */
-export const $PackSpecificationEvent = SupplierConfigEnvelope(
+export const $PackSpecificationEvent = EventEnvelope(
   "pack-specification",
   "pack-specification",
   $PackSpecification,
@@ -22,20 +23,22 @@ export const $PackSpecificationEvent = SupplierConfigEnvelope(
   description: "Generic event schema for pack specification changes",
 });
 
-function specialisePackSpecificationEvent (
+function specialisePackSpecificationEvent(
   status: (typeof packStatuses)[number],
 ) {
   const lcStatus = status.toLowerCase();
-  return SupplierConfigEnvelope(
+  return EventEnvelope(
     `pack-specification.${lcStatus}`,
     "pack-specification",
-    $PackSpecification.extend({
-      status: z.literal(status),
-    }).meta({
-      description: `Indicates the current state of the pack specification.
+    $PackSpecification
+      .extend({
+        status: z.literal(status),
+      })
+      .meta({
+        description: `Indicates the current state of the pack specification.
 
 For this event the status is always \`${status}\``,
-    }),
+      }),
     [status],
   ).meta({
     title: `pack-specification.${lcStatus} Event`,

@@ -1,6 +1,6 @@
-import {z} from "zod/index";
-import {$SupplierPack, SupplierPack} from "../domain";
-import {SupplierConfigEnvelope} from "./supplier-config-envelope";
+import { z } from "zod";
+import { $SupplierPack, SupplierPack } from "../domain";
+import { EventEnvelope } from "./event-envelope";
 
 const packStatuses = [
   "APPROVED",
@@ -10,32 +10,35 @@ const packStatuses = [
 /**
  * Generic schema for parsing any SupplierPack status change event
  */
-export const $SupplierPackEvent =
-  SupplierConfigEnvelope('supplier-pack', 'supplier-pack', $SupplierPack, packStatuses)
-    .meta({
-      title: "supplier-pack.* Event",
-      description: "Generic event schema for supplier pack changes",
-    });
+export const $SupplierPackEvent = EventEnvelope(
+  "supplier-pack",
+  "supplier-pack",
+  $SupplierPack,
+  packStatuses,
+).meta({
+  title: "supplier-pack.* Event",
+  description: "Generic event schema for supplier pack changes",
+});
 
 /**
  * Specialise the generic event schema for a single status
  * @param status
  */
-function specialiseSupplierPackEvent(
-  status: (typeof packStatuses)[number],
-) {
+function specialiseSupplierPackEvent(status: (typeof packStatuses)[number]) {
   const lcStatus = status.toLowerCase();
-  return SupplierConfigEnvelope(
+  return EventEnvelope(
     `supplier-pack.${lcStatus}`,
     "supplier-pack",
-    $SupplierPack.extend({
-      status: z.literal(status),
-    }).meta({
-      title: "SupplierPack",
-      description: `Indicates that a specific supplier is capable of producing a specific pack specification.
+    $SupplierPack
+      .extend({
+        status: z.literal(status),
+      })
+      .meta({
+        title: "SupplierPack",
+        description: `Indicates that a specific supplier is capable of producing a specific pack specification.
 
 For this event the status is always \`${status}\``,
-    }),
+      }),
     [status],
   ).meta({
     title: `supplier-pack.${lcStatus} Event`,

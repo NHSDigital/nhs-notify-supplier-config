@@ -25,6 +25,32 @@
       "format": "uuid",
       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
     },
+    "type": {
+      "title": "pack-specification.published event type",
+      "description": "Event type using reverse-DNS style",
+      "examples": [
+        "uk.nhs.notify.supplier-config.pack-specification.published.v1"
+      ],
+      "type": "string",
+      "enum": [
+        "uk.nhs.notify.supplier-config.pack-specification.published.v1"
+      ]
+    },
+    "dataschema": {
+      "title": "Data Schema URI",
+      "description": "URI of a schema that describes the event data\n\nData schema version must match the major version indicated by the type",
+      "examples": [
+        "https://notify.nhs.uk/cloudevents/schemas/supplier-config/pack-specification.published.1.0.0.schema.json"
+      ],
+      "type": "string",
+      "pattern": "^https:\\/\\/notify\\.nhs\\.uk\\/cloudevents\\/schemas\\/supplier-config\\/pack-specification\\.(?<status>published)\\.1\\.\\d+\\.\\d+\\.schema.json$"
+    },
+    "dataschemaversion": {
+      "title": "Data Schema Version",
+      "description": "Matches semantic versioning format with fixed major version (Not part of cloudevents spec?)",
+      "type": "string",
+      "pattern": "^1\\.\\d+\\.\\d+$"
+    },
     "source": {
       "title": "Event Source",
       "description": "Logical event producer path within the supplier-config domain",
@@ -38,52 +64,10 @@
         "supplier-config/pack-specification/f47ac10b-58cc-4372-a567-0e02b2c3d479"
       ],
       "type": "string",
-      "pattern": "^supplier-config\\/pack-specification\\/[a-z0-9-]+"
-    },
-    "type": {
-      "title": "PackSpecification PUBLISHED event type",
-      "description": "Event type using reverse-DNS style",
-      "examples": [
-        "uk.nhs.notify.supplier-config.pack-specification.published.v1"
-      ],
-      "type": "string",
-      "enum": [
-        "uk.nhs.notify.supplier-config.pack-specification.published.v1"
-      ]
-    },
-    "time": {
-      "title": "Event Time",
-      "description": "Timestamp when the event occurred (RFC 3339).",
-      "examples": [
-        "2025-10-01T10:15:30.000Z"
-      ],
-      "type": "string",
-      "format": "date-time",
-      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
-    },
-    "datacontenttype": {
-      "title": "Data Content Type",
-      "description": "Media type for the data field (fixed to application/json).",
-      "examples": [
-        "application/json"
-      ],
-      "type": "string",
-      "enum": [
-        "application/json"
-      ]
-    },
-    "dataschema": {
-      "title": "Data Schema URI",
-      "description": "URI of a schema that describes the event data\n\nData schema version must match the major version indicated by the type",
-      "examples": [
-        "https://notify.nhs.uk/cloudevents/schemas/supplier-config/pack-specification.published.1.0.0.schema.json"
-      ],
-      "type": "string",
-      "pattern": "^https:\\/\\/notify\\.nhs\\.uk\\/cloudevents\\/schemas\\/supplier-config\\/pack-specification\\.published\\.1\\.\\d+\\.\\d+\\.schema.json$"
+      "pattern": "\\/supplier-config\\/pack-specification\\/[a-z0-9-]+$"
     },
     "data": {
-      "title": "PackSpecification",
-      "description": "A PackSpecification defines the composition, postage and assembly attributes for producing a pack.\n\nFor this event the status is always `PUBLISHED`",
+      "description": "Indicates the current state of the pack specification.\n\nFor this event the status is always `PUBLISHED`",
       "type": "object",
       "properties": {
         "id": {
@@ -256,6 +240,27 @@
         "postage"
       ]
     },
+    "time": {
+      "title": "Event Time",
+      "description": "Timestamp when the event occurred (RFC 3339).",
+      "examples": [
+        "2025-10-01T10:15:30.000Z"
+      ],
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+    },
+    "datacontenttype": {
+      "title": "Data Content Type",
+      "description": "Media type for the data field (fixed to application/json).",
+      "examples": [
+        "application/json"
+      ],
+      "type": "string",
+      "enum": [
+        "application/json"
+      ]
+    },
     "traceparent": {
       "title": "Traceparent",
       "description": "W3C Trace Context traceparent header value.",
@@ -383,26 +388,20 @@
         "sensitive",
         "special-category"
       ]
-    },
-    "dataschemaversion": {
-      "title": "Data Schema Version",
-      "description": "Matches semantic versioning format with fixed major version (Not part of cloudevents spec?)",
-      "type": "string",
-      "pattern": "^1\\.\\d+\\.\\d+$"
     }
   },
   "required": [
     "specversion",
     "id",
+    "type",
+    "dataschema",
+    "dataschemaversion",
     "source",
     "subject",
-    "type",
-    "time",
-    "dataschema",
     "data",
+    "time",
     "traceparent",
     "recordedtime",
-    "severitynumber",
-    "dataschemaversion"
+    "severitynumber"
   ]
 }

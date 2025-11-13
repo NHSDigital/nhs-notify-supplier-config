@@ -1,6 +1,6 @@
 {
-  "title": "letter-variant.disabled Event",
-  "description": "Event schema for letter variant change to DISABLED",
+  "title": "supplier-pack.approved Event",
+  "description": "Event schema for supplier pack change to APPROVED",
   "type": "object",
   "properties": {
     "specversion": {
@@ -26,24 +26,24 @@
       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
     },
     "type": {
-      "title": "letter-variant.disabled event type",
+      "title": "supplier-pack.approved event type",
       "description": "Event type using reverse-DNS style",
       "examples": [
-        "uk.nhs.notify.supplier-config.letter-variant.disabled.v1"
+        "uk.nhs.notify.supplier-config.supplier-pack.approved.v1"
       ],
       "type": "string",
       "enum": [
-        "uk.nhs.notify.supplier-config.letter-variant.disabled.v1"
+        "uk.nhs.notify.supplier-config.supplier-pack.approved.v1"
       ]
     },
     "dataschema": {
       "title": "Data Schema URI",
       "description": "URI of a schema that describes the event data\n\nData schema version must match the major version indicated by the type",
       "examples": [
-        "https://notify.nhs.uk/cloudevents/schemas/supplier-config/letter-variant.disabled.1.0.0.schema.json"
+        "https://notify.nhs.uk/cloudevents/schemas/supplier-config/supplier-pack.approved.1.0.0.schema.json"
       ],
       "type": "string",
-      "pattern": "^https:\\/\\/notify\\.nhs\\.uk\\/cloudevents\\/schemas\\/supplier-config\\/letter-variant\\.(?<status>disabled)\\.1\\.\\d+\\.\\d+\\.schema.json$"
+      "pattern": "^https:\\/\\/notify\\.nhs\\.uk\\/cloudevents\\/schemas\\/supplier-config\\/supplier-pack\\.(?<status>approved)\\.1\\.\\d+\\.\\d+\\.schema.json$"
     },
     "dataschemaversion": {
       "title": "Data Schema Version",
@@ -64,86 +64,38 @@
         "supplier-config/pack-specification/f47ac10b-58cc-4372-a567-0e02b2c3d479"
       ],
       "type": "string",
-      "pattern": "\\/supplier-config\\/letter-variant\\/[a-z0-9-]+$"
+      "pattern": "\\/supplier-config\\/supplier-pack\\/[a-z0-9-]+$"
     },
     "data": {
-      "description": "The status of a LetterVariant indicates whether it is available for use.\n\nFor this event the status is always `DISABLED`",
+      "title": "SupplierPack",
+      "description": "Indicates that a specific supplier is capable of producing a specific pack specification.\n\nFor this event the status is always `APPROVED`",
       "type": "object",
       "properties": {
         "id": {
           "type": "string"
         },
-        "name": {
+        "packSpecificationId": {
+          "title": "A PackSpecification defines the composition, postage and assembly attributes for producing a pack. ID Reference",
+          "description": "Reference to a A PackSpecification defines the composition, postage and assembly attributes for producing a pack. by its unique identifier",
           "type": "string"
         },
-        "description": {
+        "supplierId": {
+          "title": "ChannelSupplier ID Reference",
+          "description": "Reference to a ChannelSupplier by its unique identifier",
           "type": "string"
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "STANDARD",
-            "BRAILLE",
-            "AUDIO",
-            "SAME_DAY"
-          ]
         },
         "status": {
           "type": "string",
           "enum": [
-            "DISABLED"
+            "APPROVED"
           ]
-        },
-        "contractId": {
-          "title": "An individual contract under which suppliers will be allocated capacity. ID Reference",
-          "description": "Reference to a An individual contract under which suppliers will be allocated capacity. by its unique identifier",
-          "type": "string"
-        },
-        "clientId": {
-          "type": "string"
-        },
-        "campaignIds": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "packSpecificationIds": {
-          "minItems": 1,
-          "type": "array",
-          "items": {
-            "title": "A PackSpecification defines the composition, postage and assembly attributes for producing a pack. ID Reference",
-            "description": "Reference to a A PackSpecification defines the composition, postage and assembly attributes for producing a pack. by its unique identifier",
-            "type": "string"
-          }
-        },
-        "constraints": {
-          "title": "LetterVariant Constraints",
-          "description": "Constraints that apply to this letter variant, aggregating those in the pack specifications where specified.",
-          "type": "object",
-          "properties": {
-            "maxSheets": {
-              "type": "number"
-            },
-            "deliverySLA": {
-              "type": "number"
-            },
-            "blackCoveragePercentage": {
-              "type": "number"
-            },
-            "colourCoveragePercentage": {
-              "type": "number"
-            }
-          }
         }
       },
       "required": [
         "id",
-        "name",
-        "type",
-        "status",
-        "contractId",
-        "packSpecificationIds"
+        "packSpecificationId",
+        "supplierId",
+        "status"
       ]
     },
     "time": {
