@@ -28,6 +28,11 @@
         "DISABLED"
       ]
     },
+    "contractId": {
+      "title": "An individual contract under which suppliers will be allocated capacity. ID Reference",
+      "description": "Reference to a An individual contract under which suppliers will be allocated capacity. by its unique identifier",
+      "type": "string"
+    },
     "clientId": {
       "type": "string"
     },
@@ -45,6 +50,25 @@
         "description": "Reference to a PackSpecification by its unique identifier",
         "type": "string"
       }
+    },
+    "constraints": {
+      "title": "LetterVariant Constraints",
+      "description": "Constraints that apply to this letter variant, aggregating those in the pack specifications where specified.",
+      "type": "object",
+      "properties": {
+        "maxSheets": {
+          "type": "number"
+        },
+        "deliverySLA": {
+          "type": "number"
+        },
+        "blackCoveragePercentage": {
+          "type": "number"
+        },
+        "colourCoveragePercentage": {
+          "type": "number"
+        }
+      }
     }
   },
   "required": [
@@ -52,6 +76,7 @@
     "name",
     "type",
     "status",
+    "contractId",
     "packSpecificationIds"
   ]
 }

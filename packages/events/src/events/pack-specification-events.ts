@@ -29,7 +29,9 @@ export const $PackSpecificationEvent = $EnvelopeProfile
     dataschema: z
       .string()
       .regex(
-        /^https:\/\/notify\.nhs\.uk\/cloudevents\/schemas\/supplier-config\/pack-specification\.(?<status>published|disabled)\.1\.\d+\.\d+\.schema.json$/,
+        new RegExp(
+          `^https://notify\\.nhs\\.uk/cloudevents/schemas/supplier-config/pack-specification\\.(?<status>${packStatusRegex})\\.1\\.\\d+\\.\\d+\\.schema.json$`,
+        ),
       )
       .meta({
         title: "Data Schema URI",

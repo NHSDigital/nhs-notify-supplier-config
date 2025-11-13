@@ -4,8 +4,8 @@ import { ConfigBase } from "@nhsdigital/nhs-notify-event-schemas-supplier-config
 
 export const $ChannelSupplier = ConfigBase("ChannelSupplier")
   .extend({
+    name: z.string(),
     channelType: $ChannelType,
-    outputQueue: z.string(),
   })
   .describe("ChannelSupplier");
 

@@ -4,11 +4,20 @@ import { $ChannelSupplier } from "@nhsdigital/nhs-notify-event-schemas-supplier-
 import { $PackSpecification } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/pack-specification";
 import { ConfigBase } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/common";
 
-export const $SpecificationSupplier = ConfigBase("SpecificationSupplier")
+export const $SupplierPack = ConfigBase("SupplierPack")
   .extend({
     packSpecificationId: idRef($PackSpecification),
     supplierId: idRef($ChannelSupplier),
+    status: z.enum(["SUBMITTED", "APPROVED", "REJECTED", "DEPRECATED"]).meta({
+      title: "SupplierPackStatus",
+      description:
+        "Indicates the current state of the supplier pack approval process.",
+    }),
   })
-  .describe("SpecificationSupplier");
+  .meta({
+    title: "SupplierPack",
+    description:
+      "Indicates that a specific supplier is capable of producing a specific pack specification.",
+  });
 
-export type SpecificationSupplier = z.infer<typeof $SpecificationSupplier>;
+export type SupplierPack = z.infer<typeof $SupplierPack>;

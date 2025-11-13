@@ -31,30 +31,41 @@
       "minimum": -9007199254740991,
       "maximum": 9007199254740991
     },
-    "billing": {
+    "billingId": {
+      "type": "string"
+    },
+    "constraints": {
       "type": "object",
       "properties": {
-        "basePrice": {
+        "maxSheets": {
           "type": "number"
         },
-        "unitPrice": {
+        "deliverySLA": {
+          "type": "number"
+        },
+        "blackCoveragePercentage": {
+          "type": "number"
+        },
+        "colourCoveragePercentage": {
           "type": "number"
         }
       }
     },
     "postage": {
+      "description": "Postage",
       "type": "object",
       "properties": {
-        "tariff": {
+        "id": {
           "type": "string"
         },
         "size": {
-          "type": "string"
+          "type": "string",
+          "enum": [
+            "STANDARD",
+            "LARGE"
+          ]
         },
         "deliverySLA": {
-          "type": "number"
-        },
-        "maxSheets": {
           "type": "number"
         },
         "maxWeight": {
@@ -63,7 +74,11 @@
         "maxThickness": {
           "type": "number"
         }
-      }
+      },
+      "required": [
+        "id",
+        "size"
+      ]
     },
     "assembly": {
       "type": "object",
@@ -80,13 +95,53 @@
             "COLOUR"
           ]
         },
-        "paperColour": {
-          "type": "string"
+        "paper": {
+          "description": "Paper",
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "weightGSM": {
+              "type": "number"
+            },
+            "size": {
+              "type": "string",
+              "enum": [
+                "A4",
+                "A3"
+              ]
+            },
+            "colour": {
+              "type": "string",
+              "enum": [
+                "WHITE",
+                "COLOURED"
+              ]
+            },
+            "recycled": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "id",
+            "name",
+            "weightGSM",
+            "size",
+            "colour",
+            "recycled"
+          ]
         },
-        "insert": {
-          "title": "Insert ID Reference",
-          "description": "Reference to a Insert by its unique identifier",
-          "type": "string"
+        "insertIds": {
+          "type": "array",
+          "items": {
+            "title": "Insert ID Reference",
+            "description": "Reference to a Insert by its unique identifier",
+            "type": "string"
+          }
         },
         "features": {
           "type": "array",
@@ -115,6 +170,7 @@
     "status",
     "createdAt",
     "updatedAt",
-    "version"
+    "version",
+    "postage"
   ]
 }

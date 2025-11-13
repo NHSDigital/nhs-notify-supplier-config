@@ -1,0 +1,39 @@
+{
+  "title": "SupplierAllocation",
+  "description": "Supplier Allocation configuration schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "contract": {
+      "title": "An individual contract under which suppliers will be allocated capacity. ID Reference",
+      "description": "Reference to a An individual contract under which suppliers will be allocated capacity. by its unique identifier",
+      "type": "string"
+    },
+    "supplier": {
+      "title": "ChannelSupplier ID Reference",
+      "description": "Reference to a ChannelSupplier by its unique identifier",
+      "type": "string"
+    },
+    "allocationPercentage": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "PUBLISHED",
+        "REMOVED"
+      ]
+    }
+  },
+  "required": [
+    "id",
+    "contract",
+    "supplier",
+    "allocationPercentage",
+    "status"
+  ]
+}

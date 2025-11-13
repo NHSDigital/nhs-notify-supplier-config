@@ -1,6 +1,6 @@
 {
-  "title": "letter-variant.* Event",
-  "description": "Base event schema for letter variant changes",
+  "title": "pack-specification.* Event",
+  "description": "Base event schema for pack specification changes",
   "type": "object",
   "properties": {
     "specversion": {
@@ -35,22 +35,22 @@
       "title": "Event Subject",
       "description": "Resource path (no leading slash) within the source made of segments separated by '/'.",
       "examples": [
-        "supplier-config/letter-variant/f47ac10b-58cc-4372-a567-0e02b2c3d479"
+        "supplier-config/pack-specification/f47ac10b-58cc-4372-a567-0e02b2c3d479"
       ],
       "type": "string",
-      "pattern": "^supplier-config\\/letter-variant\\/[a-z0-9-]+"
+      "pattern": "^supplier-config\\/pack-specification\\/[a-z0-9-]+"
     },
     "type": {
-      "title": "Letter event type",
+      "title": "PackSpecification event type",
       "description": "Event type using reverse-DNS style",
       "examples": [
-        "uk.nhs.notify.supplier-config.letter-variant.published.v1",
-        "uk.nhs.notify.supplier-config.letter-variant.disabled.v1"
+        "uk.nhs.notify.supplier-config.pack-specification.published.v1",
+        "uk.nhs.notify.supplier-config.pack-specification.disabled.v1"
       ],
       "type": "string",
       "enum": [
-        "uk.nhs.notify.supplier-config.letter-variant.published.v1",
-        "uk.nhs.notify.supplier-config.letter-variant.disabled.v1"
+        "uk.nhs.notify.supplier-config.pack-specification.published.v1",
+        "uk.nhs.notify.supplier-config.pack-specification.disabled.v1"
       ]
     },
     "time": {
@@ -78,15 +78,15 @@
       "title": "Data Schema URI",
       "description": "URI of a schema that describes the event data\n\nData schema version must match the major version indicated by the type",
       "examples": [
-        "https://notify.nhs.uk/cloudevents/schemas/supplier-config.letter-variant.published.1.0.0.schema.json",
-        "https://notify.nhs.uk/cloudevents/schemas/supplier-config.letter-variant.disabled.1.0.0.schema.json"
+        "https://notify.nhs.uk/cloudevents/schemas/supplier-config/pack-specification.published.1.0.0.schema.json",
+        "https://notify.nhs.uk/cloudevents/schemas/supplier-config/pack-specification.disabled.1.0.0.schema.json"
       ],
       "type": "string",
-      "pattern": "^https:\\/\\/notify\\.nhs\\.uk\\/cloudevents\\/schemas\\/supplier-config\\/letter-variant\\.(?<status>published|disabled)\\.1\\.\\d+\\.\\d+\\.schema.json$"
+      "pattern": "^https:\\/\\/notify\\.nhs\\.uk\\/cloudevents\\/schemas\\/supplier-config\\/pack-specification\\.(?<status>published|disabled)\\.1\\.\\d+\\.\\d+\\.schema.json$"
     },
     "data": {
-      "description": "A Letter Variant describes a letter that can be produced with particular characteristics, and may be scoped to a single clientId and campaignId.",
-      "title": "Letter Variant",
+      "description": "A PackSpecification defines the composition, postage and assembly attributes for producing a pack.",
+      "title": "PackSpecification",
       "type": "object",
       "properties": {
         "id": {
@@ -94,18 +94,6 @@
         },
         "name": {
           "type": "string"
-        },
-        "description": {
-          "type": "string"
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "STANDARD",
-            "BRAILLE",
-            "AUDIO",
-            "SAME_DAY"
-          ]
         },
         "status": {
           "type": "string",
@@ -115,32 +103,25 @@
             "DISABLED"
           ]
         },
-        "contractId": {
-          "title": "An individual contract under which suppliers will be allocated capacity. ID Reference",
-          "description": "Reference to a An individual contract under which suppliers will be allocated capacity. by its unique identifier",
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "billingId": {
           "type": "string"
-        },
-        "clientId": {
-          "type": "string"
-        },
-        "campaignIds": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "packSpecificationIds": {
-          "minItems": 1,
-          "type": "array",
-          "items": {
-            "title": "PackSpecification ID Reference",
-            "description": "Reference to a PackSpecification by its unique identifier",
-            "type": "string"
-          }
         },
         "constraints": {
-          "title": "LetterVariant Constraints",
-          "description": "Constraints that apply to this letter variant, aggregating those in the pack specifications where specified.",
           "type": "object",
           "properties": {
             "maxSheets": {
@@ -156,15 +137,128 @@
               "type": "number"
             }
           }
+        },
+        "postage": {
+          "description": "Postage",
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "size": {
+              "type": "string",
+              "enum": [
+                "STANDARD",
+                "LARGE"
+              ]
+            },
+            "deliverySLA": {
+              "type": "number"
+            },
+            "maxWeight": {
+              "type": "number"
+            },
+            "maxThickness": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "id",
+            "size"
+          ]
+        },
+        "assembly": {
+          "type": "object",
+          "properties": {
+            "envelopeId": {
+              "title": "Envelope ID Reference",
+              "description": "Reference to a Envelope by its unique identifier",
+              "type": "string"
+            },
+            "printColour": {
+              "type": "string",
+              "enum": [
+                "BLACK",
+                "COLOUR"
+              ]
+            },
+            "paper": {
+              "description": "Paper",
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "weightGSM": {
+                  "type": "number"
+                },
+                "size": {
+                  "type": "string",
+                  "enum": [
+                    "A4",
+                    "A3"
+                  ]
+                },
+                "colour": {
+                  "type": "string",
+                  "enum": [
+                    "WHITE",
+                    "COLOURED"
+                  ]
+                },
+                "recycled": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "weightGSM",
+                "size",
+                "colour",
+                "recycled"
+              ]
+            },
+            "insertIds": {
+              "type": "array",
+              "items": {
+                "title": "Insert ID Reference",
+                "description": "Reference to a Insert by its unique identifier",
+                "type": "string"
+              }
+            },
+            "features": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "MAILMARK",
+                  "BRAILLE",
+                  "AUDIO",
+                  "ADMAIL"
+                ]
+              }
+            },
+            "additional": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
         }
       },
       "required": [
         "id",
         "name",
-        "type",
         "status",
-        "contractId",
-        "packSpecificationIds"
+        "createdAt",
+        "updatedAt",
+        "version",
+        "postage"
       ]
     },
     "traceparent": {

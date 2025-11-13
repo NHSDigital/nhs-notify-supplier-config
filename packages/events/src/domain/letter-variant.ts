@@ -5,6 +5,7 @@ import {
   $PackSpecification
 } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/pack-specification";
 import { z } from "zod";
+import { $Contract } from "./contract";
 
 export const $LetterType = z.enum([
   "STANDARD",
@@ -21,6 +22,7 @@ export const $LetterVariant = ConfigBase("LetterVariant")
     description: z.string().optional(),
     type: $LetterType,
     status: $LetterVariantStatus,
+    contractId: idRef($Contract),
     clientId: z.string().optional(),
     campaignIds: z.array(z.string()).optional(),
     packSpecificationIds: z.array(idRef($PackSpecification)).nonempty(),

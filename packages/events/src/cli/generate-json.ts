@@ -1,8 +1,12 @@
 import { z } from "zod";
 import * as fs from "node:fs";
-import packageJson from "@nhsdigital/nhs-notify-event-schemas-supplier-config/package.json";
-import { $LetterVariant } from "../domain/letter-variant";
-import { $PackSpecification } from "../domain/pack-specification";
+import {
+  $Contract,
+  $LetterVariant,
+  $PackSpecification,
+  $SupplierAllocation,
+  $SupplierPack,
+} from "../domain";
 import {
   $LetterVariantEvent,
   letterVariantEvents,
@@ -12,12 +16,12 @@ import {
   packSpecificationEvents,
 } from "../events/pack-specification-events";
 
-// version currently unused; retained for future tagging of schema output
-const { version } = packageJson; // eslint-disable-line @typescript-eslint/no-unused-vars
-
 for (const [key, schema] of Object.entries({
   "letter-variant": $LetterVariant,
   "pack-specification": $PackSpecification,
+  "supplier-pack": $SupplierPack,
+  contract: $Contract,
+  "supplier-allocation": $SupplierAllocation,
 })) {
   const jsonSchema = z.toJSONSchema(schema, {
     io: "input",
@@ -51,7 +55,6 @@ const letterAnySchema = z.toJSONSchema($LetterVariantEvent, {
 });
 fs.mkdirSync("schemas/events", { recursive: true });
 const letterAnyFile = `schemas/events/letter-variant.any.schema.json`;
-// eslint-disable-next-line security/detect-non-literal-fs-filename
 fs.writeFileSync(letterAnyFile, JSON.stringify(letterAnySchema, null, 2));
 console.info(`Wrote JSON schema for letter-variant.any to ${letterAnyFile}`);
 
@@ -75,6 +78,5 @@ const packAnySchema = z.toJSONSchema($PackSpecificationEvent, {
 });
 fs.mkdirSync("schemas/events", { recursive: true });
 const packAnyFile = `schemas/events/pack-specification.any.schema.json`;
-// eslint-disable-next-line security/detect-non-literal-fs-filename
 fs.writeFileSync(packAnyFile, JSON.stringify(packAnySchema, null, 2));
 console.info(`Wrote JSON schema for pack-specification.any to ${packAnyFile}`);
