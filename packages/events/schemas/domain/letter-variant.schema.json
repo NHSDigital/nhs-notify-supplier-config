@@ -1,0 +1,83 @@
+{
+  "title": "LetterVariant",
+  "description": "A Letter Variant describes a letter that can be produced with particular characteristics, and may be scoped to a single clientId and campaignId.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "STANDARD",
+        "BRAILLE",
+        "AUDIO",
+        "SAME_DAY"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "DRAFT",
+        "PUBLISHED",
+        "DISABLED"
+      ]
+    },
+    "contractId": {
+      "title": "An individual contract under which suppliers will be allocated capacity. ID Reference",
+      "description": "Reference to a An individual contract under which suppliers will be allocated capacity. by its unique identifier",
+      "type": "string"
+    },
+    "clientId": {
+      "type": "string"
+    },
+    "campaignIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "packSpecificationIds": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "title": "A PackSpecification defines the composition, postage and assembly attributes for producing a pack. ID Reference",
+        "description": "Reference to a A PackSpecification defines the composition, postage and assembly attributes for producing a pack. by its unique identifier",
+        "type": "string"
+      }
+    },
+    "constraints": {
+      "title": "LetterVariant Constraints",
+      "description": "Constraints that apply to this letter variant, aggregating those in the pack specifications where specified.",
+      "type": "object",
+      "properties": {
+        "maxSheets": {
+          "type": "number"
+        },
+        "deliverySLA": {
+          "type": "number"
+        },
+        "blackCoveragePercentage": {
+          "type": "number"
+        },
+        "colourCoveragePercentage": {
+          "type": "number"
+        }
+      }
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "type",
+    "status",
+    "contractId",
+    "packSpecificationIds"
+  ]
+}

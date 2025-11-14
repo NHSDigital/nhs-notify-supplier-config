@@ -6,7 +6,7 @@
     "@types/jest": "^29.5.14",
     "@typescript-eslint/eslint-plugin": "^8.27.0",
     "@typescript-eslint/parser": "^8.39.0",
-    "esbuild": "^0.25.8",
+    "esbuild": "^0.25.9",
     "eslint": "^9.32.0",
     "eslint-config-airbnb-extended": "^2.1.2",
     "eslint-config-next": "^15.4.5",
@@ -29,7 +29,7 @@
     "jest-html-reporter": "^3.10.2",
     "jest-mock-extended": "^3.0.7",
     "lcov-result-merger": "^5.0.1",
-    "ts-jest": "^29.3.0",
+    "ts-jest": "^29.4.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.19.3",
     "typescript-eslint": "^8.35.1"
@@ -42,6 +42,8 @@
     "react": "^19.0.0"
   },
   "scripts": {
+    "deps:check": "npx syncpack list-mismatches",
+    "deps:sync": "npx syncpack fix-mismatches",
     "generate-dependencies": "npm run generate-dependencies --workspaces --if-present",
     "lint": "npm run lint --workspaces",
     "lint:fix": "npm run lint:fix --workspaces",
@@ -51,8 +53,7 @@
   },
   "version": "1.0.0",
   "workspaces": [
-    "lambdas/example-lambda",
-    "packages/event-builder",
-    "packages/schemas"
+    "lambdas/*",
+    "packages/*"
   ]
 }

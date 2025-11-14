@@ -1,0 +1,37 @@
+{
+  "title": "SupplierPack",
+  "description": "Indicates that a specific supplier is capable of producing a specific pack specification.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "packSpecificationId": {
+      "title": "A PackSpecification defines the composition, postage and assembly attributes for producing a pack. ID Reference",
+      "description": "Reference to a A PackSpecification defines the composition, postage and assembly attributes for producing a pack. by its unique identifier",
+      "type": "string"
+    },
+    "supplierId": {
+      "title": "ChannelSupplier ID Reference",
+      "description": "Reference to a ChannelSupplier by its unique identifier",
+      "type": "string"
+    },
+    "status": {
+      "title": "SupplierPackStatus",
+      "description": "Indicates the current state of the supplier pack approval process.",
+      "type": "string",
+      "enum": [
+        "SUBMITTED",
+        "APPROVED",
+        "REJECTED",
+        "DISABLED"
+      ]
+    }
+  },
+  "required": [
+    "id",
+    "packSpecificationId",
+    "supplierId",
+    "status"
+  ]
+}
