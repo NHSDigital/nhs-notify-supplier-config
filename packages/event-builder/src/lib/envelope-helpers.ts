@@ -19,8 +19,7 @@ const SEVERITY_MAP: Record<SeverityText, number> = {
 
 export const severityNumber = (severity: SeverityText): number => {
   // eslint-disable-next-line security/detect-object-injection
-  const value = SEVERITY_MAP[severity];
-  return value ?? 2; // INFO fallback
+  return SEVERITY_MAP[severity];
 };
 
 export const generateTraceParent = (): string => {
