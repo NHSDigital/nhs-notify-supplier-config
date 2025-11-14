@@ -69,13 +69,13 @@ export function EventEnvelope<TData extends z.ZodTypeAny>(
       subject: z
         .string()
         // eslint-disable-next-line security/detect-non-literal-regexp
-        .regex(new RegExp(`^supplier-config/${resourceName}/[a-z0-9-]+$`))
+        .regex(new RegExp(`^${resourceName}/[a-z0-9-]+$`))
         .meta({
           title: "Event Subject",
           description:
             "Resource path (no leading slash) within the source made of segments separated by '/'.",
           examples: [
-            "supplier-config/pack-specification/f47ac10b-58cc-4372-a567-0e02b2c3d479",
+            "pack-specification/f47ac10b-58cc-4372-a567-0e02b2c3d479",
           ],
         }),
 

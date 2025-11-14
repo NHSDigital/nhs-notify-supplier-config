@@ -11,7 +11,7 @@ describe("EventEnvelope schema validation", () => {
     specversion: "1.0",
     id: "6f1c2a53-3d54-4a0a-9a0b-0e9ae2d4c111",
     source: "/control-plane/supplier-config/ordering",
-    subject: "supplier-config/order/769acdd4",
+    subject: "order/769acdd4",
     type: "uk.nhs.notify.supplier-config.order.read.v1",
     time: "2025-10-01T10:15:30.000Z",
     data: {
