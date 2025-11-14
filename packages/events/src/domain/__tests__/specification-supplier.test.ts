@@ -1,12 +1,13 @@
 import {
-  $PackSupplier,
-  PackSupplier,
-} from "src/domain/pack-supplier";
+  $SupplierPack,
+  SupplierPack,
+} from "../supplier-pack";
 import {
   EnvelopeId,
   PackSpecification,
   PostageId,
 } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/pack-specification";
+import { SupplierId } from "../supplier";
 
 describe("SpecificationSupplier schema validation", () => {
   const standardLetterSpecification: PackSpecification = {
@@ -28,15 +29,14 @@ describe("SpecificationSupplier schema validation", () => {
     },
   };
 
-  const testSpecificationSupplier: PackSupplier = {
+  const testSupplierPack: SupplierPack = {
     id: "test-specification-supplier" as any,
     packSpecificationId: standardLetterSpecification.id,
-    supplierId: "supplier-123" as any,
+    supplierId: SupplierId("supplier-123"),
+    status: "APPROVED",
   };
 
   it("should validate a specification supplier", () => {
-    expect(() =>
-      $PackSupplier.parse(testSpecificationSupplier),
-    ).not.toThrow();
+    expect(() => $SupplierPack.parse(testSupplierPack)).not.toThrow();
   });
 });

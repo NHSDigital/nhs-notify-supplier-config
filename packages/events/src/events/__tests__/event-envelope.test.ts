@@ -8,7 +8,6 @@ describe("EventEnvelope schema validation", () => {
   const baseValidEnvelope: Envelope = {
     dataschema:
       "https://notify.nhs.uk/cloudevents/schemas/supplier-config/order.read.1.0.0.schema.json",
-    dataschemaversion: "1.0.0",
     specversion: "1.0",
     id: "6f1c2a53-3d54-4a0a-9a0b-0e9ae2d4c111",
     source: "/control-plane/supplier-config/ordering",
@@ -46,75 +45,6 @@ describe("EventEnvelope schema validation", () => {
 
       const result = $Envelope.safeParse(envelope);
       expect(result.success).toBe(false);
-    });
-  });
-
-  describe("superRefine: data-plane subject validation", () => {
-    it("should accept valid data-plane subject with namespace/id pattern", () => {
-      const envelope = {
-        ...baseValidEnvelope,
-        source: "/data-plane/ordering",
-        subject: "customer/920fca11-596a-4eca-9c47-99f624614658/order/769acdd4",
-      };
-
-      const result = $Envelope.safeParse(envelope);
-      expect(result.success).toBe(true);
-    });
-
-    it("should accept data-plane subject with multiple segments", () => {
-      const envelope = {
-        ...baseValidEnvelope,
-        source: "/data-plane/ordering",
-        subject:
-          "origin/920fca11-596a-4eca-9c47-99f624614658/order/769acdd4-6a47-496f-999f-76a6fd2c3959/item/4f5e17c0-ec57-4cee-9a86-14580cf5af7d",
-      };
-
-      const result = $Envelope.safeParse(envelope);
-      expect(result.success).toBe(true);
-    });
-
-    it("should reject data-plane subject without namespace/id pattern", () => {
-      const envelope = {
-        ...baseValidEnvelope,
-        source: "/data-plane/ordering",
-        subject: "single-segment",
-      };
-
-      const result = $Envelope.safeParse(envelope);
-      expect(result.success).toBe(false);
-    });
-
-    it("should reject data-plane subject with only one segment after namespace", () => {
-      const envelope = {
-        ...baseValidEnvelope,
-        source: "/data-plane/ordering",
-        subject: "customer",
-      };
-
-      const result = $Envelope.safeParse(envelope);
-      expect(result.success).toBe(false);
-    });
-
-    it("should accept control-plane subject without namespace/id requirement", () => {
-      const envelope = {
-        ...baseValidEnvelope,
-        source: "/control-plane/audit",
-        subject: "single-segment",
-      };
-
-      const result = $Envelope.safeParse(envelope);
-      expect(result.success).toBe(true);
-    });
-
-    it("should accept control-plane subject with any format", () => {
-      const envelope = {
-        ...baseValidEnvelope,
-        source: "/control-plane/config",
-        subject: "config/settings/database",
-      };
-
-      const result = $Envelope.safeParse(envelope);
-      expect(result.success).toBe(true);
     });
   });
 
@@ -279,7 +209,6 @@ describe("EventEnvelope schema validation", () => {
       const envelope = {
         ...baseValidEnvelope,
         datacontenttype: "application/json",
-        dataschema: "https://example.com/schema.json",
         tracestate: "rojo=00f067aa0ba902b7",
         partitionkey: "customer-920fca11",
         sampledrate: 5,
@@ -292,49 +221,20 @@ describe("EventEnvelope schema validation", () => {
       };
 
       const result = $Envelope.safeParse(envelope);
-      expect(result.success).toBe(true);
-    });
-
-    it("should accept envelope without optional fields", () => {
-      const envelope = {
-        specversion: "1.0",
-        id: "6f1c2a53-3d54-4a0a-9a0b-0e9ae2d4c111",
-        source: "/data-plane/ordering",
-        subject: "customer/920fca11/order/769acdd4",
-        type: "uk.nhs.notify.ordering.order.read",
-        time: "2025-10-01T10:15:30.000Z",
-        data: { "notify-payload": {} },
-        traceparent: "00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01",
-        recordedtime: "2025-10-01T10:15:30.250Z",
-        severitynumber: 2,
-        severitytext: "INFO",
-      };
-
-      const result = $Envelope.safeParse(envelope);
+      expect(result.error).toBeUndefined();
       expect(result.success).toBe(true);
     });
   });
 
   describe("edge cases", () => {
-    it("should handle data-plane source with multiple path segments", () => {
-      const envelope = {
-        ...baseValidEnvelope,
-        source: "/data-plane/ordering/subsystem",
-        subject: "customer/123/order/456",
-      };
-
-      const result = $Envelope.safeParse(envelope);
-      expect(result.success).toBe(true);
-    });
-
     it("should handle control-plane source with multiple path segments", () => {
       const envelope = {
         ...baseValidEnvelope,
-        source: "/control-plane/audit/security",
-        subject: "audit-log",
+        source: "/control-plane/supplier-config/security",
       };
 
       const result = $Envelope.safeParse(envelope);
+      expect(result.error).toBeUndefined();
       expect(result.success).toBe(true);
     });
 
@@ -342,16 +242,6 @@ describe("EventEnvelope schema validation", () => {
       const envelope = {
         ...baseValidEnvelope,
         source: "/invalid-plane/test",
-      };
-
-      const result = $Envelope.safeParse(envelope);
-      expect(result.success).toBe(false);
-    });
-
-    it("should reject invalid event type with forbidden verbs", () => {
-      const envelope = {
-        ...baseValidEnvelope,
-        type: "uk.nhs.notify.ordering.order.completed",
       };
 
       const result = $Envelope.safeParse(envelope);

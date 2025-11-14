@@ -68,7 +68,6 @@ describe("letter-variant-event-builder", () => {
       config,
     );
     expect(ev).toBeDefined();
-    expect(ev?.dataschemaversion).toBe("1.999.0");
     expect(ev?.dataschema).toMatch(
       /letter-variant\.published\.1\.999\.0\.schema\.json$/,
     );

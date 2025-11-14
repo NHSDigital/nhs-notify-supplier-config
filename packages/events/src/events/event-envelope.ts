@@ -46,6 +46,7 @@ export function EventEnvelope<TData extends z.ZodTypeAny>(
       dataschema: z
         .string()
         .regex(
+          // eslint-disable-next-line security/detect-non-literal-regexp
           new RegExp(
             `^https://notify\\.nhs\\.uk/cloudevents/schemas/supplier-config/${resourceName}\\.(?<status>${statusRegex})\\.1\\.\\d+\\.\\d+\\.schema.json$`,
           ),
@@ -54,15 +55,6 @@ export function EventEnvelope<TData extends z.ZodTypeAny>(
           title: "Data Schema URI",
           description: `URI of a schema that describes the event data\n\nData schema version must match the major version indicated by the type`,
           examples: schemaExamples,
-        }),
-
-      dataschemaversion: z
-        .string()
-        .regex(/^1\.\d+\.\d+$/)
-        .meta({
-          title: "Data Schema Version",
-          description:
-            "Matches semantic versioning format with fixed major version (Not part of cloudevents spec?)",
         }),
 
       source: z
@@ -76,6 +68,7 @@ export function EventEnvelope<TData extends z.ZodTypeAny>(
 
       subject: z
         .string()
+        // eslint-disable-next-line security/detect-non-literal-regexp
         .regex(new RegExp(`/supplier-config/${resourceName}/[a-z0-9-]+$`))
         .meta({
           title: "Event Subject",
@@ -93,6 +86,7 @@ export function EventEnvelope<TData extends z.ZodTypeAny>(
         description: "Timestamp when the event occurred (RFC 3339).",
         examples: ["2025-10-01T10:15:30.000Z"],
       }),
+
       datacontenttype: z.optional(
         z.literal("application/json").meta({
           title: "Data Content Type",
@@ -133,12 +127,14 @@ export function EventEnvelope<TData extends z.ZodTypeAny>(
             examples: ["customer-920fca11"],
           }),
       ),
+
       recordedtime: z.iso.datetime().meta({
         title: "Recorded Time",
         description:
           "Timestamp when the event was recorded/persisted (should be >= time).",
         examples: ["2025-10-01T10:15:30.250Z"],
       }),
+
       sampledrate: z.optional(
         z
           .number()
@@ -151,6 +147,7 @@ export function EventEnvelope<TData extends z.ZodTypeAny>(
             examples: [5],
           }),
       ),
+
       sequence: z.optional(
         z
           .string()
@@ -162,6 +159,7 @@ export function EventEnvelope<TData extends z.ZodTypeAny>(
             examples: ["00000000000000000042"],
           }),
       ),
+
       severitytext: z.optional(
         z.enum(["TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"]).meta({
           title: "Severity Text",
@@ -169,6 +167,7 @@ export function EventEnvelope<TData extends z.ZodTypeAny>(
           examples: ["DEBUG"],
         }),
       ),
+
       severitynumber: z
         .number()
         .int()
@@ -180,6 +179,7 @@ export function EventEnvelope<TData extends z.ZodTypeAny>(
             "Numeric severity (TRACE=0, DEBUG=1, INFO=2, WARN=3, ERROR=4, FATAL=5).",
           examples: [1],
         }),
+
       dataclassification: z.optional(
         z.enum(["public", "internal", "confidential", "restricted"]).meta({
           title: "Data Classification",
@@ -187,6 +187,7 @@ export function EventEnvelope<TData extends z.ZodTypeAny>(
           examples: ["restricted"],
         }),
       ),
+
       dataregulation: z.optional(
         z
           .enum([
@@ -203,6 +204,7 @@ export function EventEnvelope<TData extends z.ZodTypeAny>(
             examples: ["ISO-27001"],
           }),
       ),
+
       datacategory: z.optional(
         z
           .enum(["non-sensitive", "standard", "sensitive", "special-category"])
@@ -215,17 +217,6 @@ export function EventEnvelope<TData extends z.ZodTypeAny>(
       ),
     })
     .superRefine((obj, ctx) => {
-      if (
-        /^\/data-plane/.test(obj.source) &&
-        !/^[a-z0-9-]+(\/[^/]+)+$/.test(obj.subject)
-      ) {
-        ctx.addIssue({
-          code: "custom",
-          message:
-            "For /data-plane sources, subject must start with a {namespace}/{id} and may have further segments separated by '/'.",
-          path: ["subject"],
-        });
-      }
       if (obj.severitytext !== undefined) {
         const mapping = {
           TRACE: 0,

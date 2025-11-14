@@ -1,5 +1,5 @@
 export * from "./channel";
-export * from "./channel-supplier";
+export * from "./supplier";
 export * from "./common";
 export * from "./contract";
 export * from "./letter-variant";

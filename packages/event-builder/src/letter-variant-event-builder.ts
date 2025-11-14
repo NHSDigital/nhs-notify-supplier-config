@@ -50,7 +50,6 @@ export const buildLetterVariantEvent = (
     time: now,
     datacontenttype: "application/json",
     dataschema,
-    dataschemaversion,
     data: { ...variant, status: variant.status },
     traceparent: generateTraceParent(),
     recordedtime: now,

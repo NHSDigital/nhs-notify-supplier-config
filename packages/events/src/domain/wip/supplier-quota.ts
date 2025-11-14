@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { ConfigBase } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/common";
 import { idRef } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/helpers/id-ref";
-import { $ChannelSupplier } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/channel-supplier";
+import { $ChannelSupplier } from "src/domain/supplier";
 
 export const $DayOfWeek = z.enum([
   "Mon",

@@ -5,6 +5,7 @@ import {
 } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/events/letter-variant-events";
 import { LetterVariantId } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/letter-variant";
 import { PackSpecificationId } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/pack-specification";
+import { ContractId } from "../../domain";
 
 describe("LetterVariant Events", () => {
   describe("letter-variant.published event", () => {
@@ -12,7 +13,7 @@ describe("LetterVariant Events", () => {
       specversion: "1.0",
       id: "6f1c2a53-3d54-4a0a-9a0b-0e9ae2d4c111",
       source: "/control-plane/supplier-config",
-      subject: "supplier-config/letter-variant/standard-letter-variant",
+      subject: "/supplier-config/letter-variant/standard-letter-variant",
       type: "uk.nhs.notify.supplier-config.letter-variant.published.v1",
       time: "2025-10-01T10:15:30.000Z",
       recordedtime: "2025-10-01T10:15:30.250Z",
@@ -21,12 +22,12 @@ describe("LetterVariant Events", () => {
       datacontenttype: "application/json",
       dataschema:
         "https://notify.nhs.uk/cloudevents/schemas/supplier-config/letter-variant.published.1.0.0.schema.json",
-      dataschemaversion: "1.0.0",
       traceparent: "00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01",
       data: {
         id: LetterVariantId("standard-letter-variant"),
         name: "Standard Letter Variant",
         description: "A standard letter variant for general correspondence",
+        contractId: ContractId("supplier-framework-123"),
         type: "STANDARD",
         status: "PUBLISHED",
         packSpecificationIds: [
@@ -38,12 +39,14 @@ describe("LetterVariant Events", () => {
 
     it("should validate a valid letter-variant.published event", () => {
       const result = $LetterVariantEvent.safeParse(validPublishedEvent);
+      expect(result.error).toBeUndefined();
       expect(result.success).toBe(true);
     });
 
     it("should validate using the specialised published schema", () => {
       const publishedSchema = letterVariantEvents["letter-variant.published"];
       const result = publishedSchema.safeParse(validPublishedEvent);
+      expect(result.error).toBeUndefined();
       expect(result.success).toBe(true);
     });
 
@@ -67,6 +70,7 @@ describe("LetterVariant Events", () => {
         data: {
           id: LetterVariantId("braille-variant"),
           name: "Braille Letter Variant",
+          contractId: ContractId("supplier-framework-123"),
           type: "BRAILLE",
           status: "PUBLISHED",
           packSpecificationIds: [PackSpecificationId("braille")],
@@ -83,6 +87,7 @@ describe("LetterVariant Events", () => {
         data: {
           id: LetterVariantId("audio-variant"),
           name: "Audio Letter Variant",
+          contractId: ContractId("supplier-framework-123"),
           type: "AUDIO",
           status: "PUBLISHED",
           packSpecificationIds: [PackSpecificationId("audio")],
@@ -99,6 +104,7 @@ describe("LetterVariant Events", () => {
         data: {
           id: LetterVariantId("same-day-variant"),
           name: "Same Day Letter Variant",
+          contractId: ContractId("supplier-framework-123"),
           type: "SAME_DAY",
           status: "PUBLISHED",
           packSpecificationIds: [PackSpecificationId("same-day")],
@@ -151,10 +157,11 @@ describe("LetterVariant Events", () => {
       expect(result.success).toBe(false);
     });
 
-    it("should reject event with invalid dataschemaversion format", () => {
+    it("should reject event with invalid dataschema version format", () => {
       const invalidEvent = {
         ...validPublishedEvent,
-        dataschemaversion: "2.0.0", // Major version must be 1
+        dataschema:
+          "https://notify.nhs.uk/cloudevents/schemas/supplier-config/letter-variant.disabled.2.0.0.schema.json", // Major version must be 1
       };
 
       const result = $LetterVariantEvent.safeParse(invalidEvent);
@@ -212,7 +219,7 @@ describe("LetterVariant Events", () => {
       specversion: "1.0",
       id: "7f2d3b64-4e65-4b1b-8c1c-bf3e5d222abc",
       source: "/control-plane/supplier-config",
-      subject: "supplier-config/letter-variant/disabled-letter-variant",
+      subject: "/supplier-config/letter-variant/disabled-letter-variant",
       type: "uk.nhs.notify.supplier-config.letter-variant.disabled.v1",
       time: "2025-10-01T11:20:45.000Z",
       recordedtime: "2025-10-01T11:20:45.500Z",
@@ -221,11 +228,11 @@ describe("LetterVariant Events", () => {
       datacontenttype: "application/json",
       dataschema:
         "https://notify.nhs.uk/cloudevents/schemas/supplier-config/letter-variant.disabled.1.0.0.schema.json",
-      dataschemaversion: "1.0.0",
       traceparent: "00-1bf8762027de54ee9559fc322d91430d-c8be7c2270314442-01",
       data: {
         id: LetterVariantId("disabled-letter-variant"),
         name: "Disabled Letter Variant",
+        contractId: ContractId("supplier-framework-123"),
         type: "STANDARD",
         status: "DISABLED",
         packSpecificationIds: [PackSpecificationId("bau-standard-c5")],
@@ -234,6 +241,7 @@ describe("LetterVariant Events", () => {
 
     it("should validate a valid letter-variant.disabled event", () => {
       const result = $LetterVariantEvent.safeParse(validDisabledEvent);
+      expect(result.error).toBeUndefined();
       expect(result.success).toBe(true);
     });
 
@@ -270,7 +278,9 @@ describe("LetterVariant Events", () => {
     });
 
     it("should not contain draft event schema", () => {
-      expect(letterVariantEvents["letter-variant.draft"]).toBeUndefined();
+      expect(
+        (letterVariantEvents as any)["letter-variant.draft"],
+      ).toBeUndefined();
     });
   });
 });
