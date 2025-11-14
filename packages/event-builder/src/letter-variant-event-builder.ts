@@ -46,7 +46,7 @@ export const buildLetterVariantEvent = (
     id: randomUUID(),
     source: buildEventSource(config),
     subject: `supplier-config/letter-variant/${variant.id}`,
-    type: specialised.shape.type.value,
+    type: specialised.shape.type.options[0],
     time: now,
     datacontenttype: "application/json",
     dataschema,

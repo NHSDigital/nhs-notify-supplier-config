@@ -33,7 +33,7 @@ export const buildPackSpecificationEvent = (
   const specialised = packSpecificationEvents[schemaKey];
   if (!specialised) {
     throw new Error(
-      `No specialised pack-specification event schema found for status ${pack.status}`,
+      `No specialised event schema found for status ${pack.status}`,
     );
   }
   const now = new Date().toISOString();
@@ -45,7 +45,7 @@ export const buildPackSpecificationEvent = (
     id: randomUUID(),
     source: buildEventSource(config),
     subject: `supplier-config/pack-specification/${pack.id}`,
-    type: specialised.shape.type.value,
+    type: specialised.shape.type.options[0],
     time: now,
     datacontenttype: "application/json",
     dataschema,

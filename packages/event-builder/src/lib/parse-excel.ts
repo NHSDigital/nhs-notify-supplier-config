@@ -51,6 +51,7 @@ interface LetterVariantRow {
   id: string;
   name: string;
   description?: string;
+  contractId: string;
   packSpecificationIds: string;
   type: string;
   status: string;
@@ -237,6 +238,7 @@ function parseLetterVariant(row: LetterVariantRow): LetterVariant {
     id: LetterVariantId(row.id),
     name: row.name,
     description: row.description || row.name,
+    contractId: row.contractId as LetterVariant["contractId"],
     type: row.type as LetterVariant["type"],
     status: row.status as LetterVariant["status"],
     packSpecificationIds: baseIds.map((id) => PackSpecificationId(id)),

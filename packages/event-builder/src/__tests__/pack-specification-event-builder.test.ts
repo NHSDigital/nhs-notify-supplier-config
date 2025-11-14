@@ -5,14 +5,14 @@ import {
 } from "../pack-specification-event-builder";
 
 describe("pack-specification-event-builder", () => {
-  const base: Partial<PackSpecification> = {
+  const base = {
     name: "Test Pack",
     status: "PUBLISHED",
     createdAt: "2024-01-01T00:00:00.000Z",
     updatedAt: "2024-01-01T00:00:00.000Z",
     version: 1,
     postage: { id: "postage-test" as any, size: "STANDARD" },
-  };
+  } satisfies Omit<PackSpecification, "id">;
 
   it("skips draft", () => {
     const ev = buildPackSpecificationEvent({
@@ -23,19 +23,30 @@ describe("pack-specification-event-builder", () => {
     expect(ev).toBeUndefined();
   });
 
+  it("throws on unknown status", () => {
+    const pack = {
+      ...base,
+      id: "11111111-1111-1111-1111-111111111111" as any,
+      status: "UNKNOWN" as any,
+    } as unknown as PackSpecification;
+    expect(() => buildPackSpecificationEvent(pack)).toThrow(
+      /No specialised event schema found for status UNKNOWN/,
+    );
+  });
+
   it("builds published", () => {
-    const ev = buildPackSpecificationEvent({
+    const event = buildPackSpecificationEvent({
       ...base,
       id: "22222222-2222-2222-2222-222222222222" as any,
       status: "PUBLISHED",
-    } as PackSpecification);
-    expect(ev).toBeDefined();
-    expect(ev!.type).toMatch(/pack-specification.published/);
-    expect(ev!.subject).toBe(
+    } satisfies PackSpecification);
+    expect(event).toBeDefined();
+    expect(event!.type).toMatch(/pack-specification.published/);
+    expect(event!.subject).toBe(
       "supplier-config/pack-specification/22222222-2222-2222-2222-222222222222",
     );
-    expect(ev!.partitionkey).toBe("22222222-2222-2222-2222-222222222222");
-    expect(ev!.severitytext).toBe("INFO");
+    expect(event!.partitionkey).toBe("22222222-2222-2222-2222-222222222222");
+    expect(event!.severitytext).toBe("INFO");
   });
 
   it("builds multiple with sequence ordering", () => {

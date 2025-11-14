@@ -1,9 +1,13 @@
-import { LetterVariant } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/letter-variant";
-import { buildLetterVariantEvents } from "../letter-variant-event-builder";
+import {
+  LetterVariant,
+  LetterVariantId,
+} from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/letter-variant";
 import {
   EventBridgeClient,
   PutEventsCommand,
 } from "@aws-sdk/client-eventbridge";
+import {ContractId, PackSpecificationId} from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src";
+import { buildLetterVariantEvents } from "../letter-variant-event-builder";
 
 jest.mock("@aws-sdk/client-eventbridge", () => {
   const actual = jest.requireActual("@aws-sdk/client-eventbridge");
@@ -23,12 +27,15 @@ describe("publish cli behaviour (indirect)", () => {
       .slice(0, 32)
       .replace(/(.{8})(.{4})(.{4})(.{4})(.{12})/, "$1-$2-$3-$4-$5");
     variants[`v${i}`] = {
-      id: id as any,
+      id: LetterVariantId(id),
       name: `Variant ${i}`,
       type: "STANDARD",
+      contractId: ContractId("contract-123"),
       status: i % 2 === 0 ? "PUBLISHED" : "DISABLED",
-      packSpecificationIds: ["00000000-0000-0000-0000-000000000001" as any],
-    } as LetterVariant;
+      packSpecificationIds: [
+        PackSpecificationId("00000000-0000-0000-0000-000000000001"),
+      ],
+    } satisfies LetterVariant;
   }
 
   it("buildLetterVariantEvents chunks >10", async () => {

@@ -1,4 +1,7 @@
-import { LetterVariant } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/letter-variant";
+import {
+  ContractId,
+  LetterVariant,
+} from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src";
 import {
   buildLetterVariantEvent,
   buildLetterVariantEvents,
@@ -9,6 +12,7 @@ describe("letter-variant-event-builder", () => {
   const base: Partial<LetterVariant> = {
     name: "Test Variant",
     description: "Test",
+    contractId: ContractId("contract-123"),
     type: "STANDARD",
     packSpecificationIds: ["00000000-0000-0000-0000-000000000001" as any],
     clientId: "client-1",
@@ -21,6 +25,17 @@ describe("letter-variant-event-builder", () => {
       status: "DRAFT",
     } as LetterVariant);
     expect(ev).toBeUndefined();
+  });
+
+  it("throws on unknown status", () => {
+    const variant = {
+      ...base,
+      id: "11111111-1111-1111-1111-111111111111" as any,
+      status: "UNKNOWN" as any,
+    } as unknown as LetterVariant;
+    expect(() => buildLetterVariantEvent(variant)).toThrow(
+      /No specialised event schema found for status UNKNOWN/,
+    );
   });
 
   it("builds published", () => {
