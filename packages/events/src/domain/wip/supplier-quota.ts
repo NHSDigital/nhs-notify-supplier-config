@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { ConfigBase } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/common";
 import { idRef } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/helpers/id-ref";
-import { $ChannelSupplier } from "src/domain/supplier";
+import { $Supplier } from "../supplier";
 
 export const $DayOfWeek = z.enum([
   "Mon",
@@ -28,7 +28,7 @@ export type Schedule = z.infer<typeof $Schedule>;
 
 export const $SupplierQuota = ConfigBase("SupplierQuota")
   .extend({
-    channelSupplierId: idRef($ChannelSupplier),
+    channelSupplierId: idRef($Supplier),
     inputQueueIdPatterns: z.array(z.string()),
     tps: z.preprocess((val) => {
       if (typeof val === "string") {

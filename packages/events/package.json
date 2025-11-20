@@ -13,20 +13,22 @@
     "typescript": "^5.9.3",
     "zod-mermaid": "^1.1.0"
   },
-  "main": "src/index.ts",
+  "main": "dist/index.js",
   "name": "@nhsdigital/nhs-notify-event-schemas-supplier-config",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
   },
   "repository": "git@github.com:NHSDigital/nhs-notify-supplier-config.git",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -p ./tsconfig.build.json",
     "dev": "ts-node src/index.ts",
     "examples": "ts-node src/examples/specification-examples.ts",
     "gen:json": "ts-node src/cli/generate-json.ts",
+    "prepare": "npm run build",
     "start": "node dist/index.js",
     "test": "jest",
     "test:unit": "jest"
   },
+  "types": "dist/index.d.ts",
   "version": "1.0.0"
 }
