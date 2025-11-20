@@ -6,4 +6,8 @@ export * from "./domain/pack-specification";
 export * from "./domain/supplier";
 export * from "./domain/supplier-allocation";
 export * from "./domain/supplier-pack";
+export * from "./events/contract-events";
+export * from "./events/event-envelope";
 export * from "./events/pack-specification-events";
+export * from "./events/supplier-allocation-events";
+export * from "./events/supplier-pack-events";

@@ -5,8 +5,9 @@ export const $Contract = ConfigBase("Contract")
   .extend({
     name: z.string(),
     description: z.string().optional(),
-    startDate: z.string(), // ISO date
-    endDate: z.string().optional(), // ISO date
+    status: z.enum(["DRAFT", "PUBLISHED", "DISABLED"]),
+    startDate: z.iso.date(), // ISO date
+    endDate: z.iso.date().optional(), // ISO date
   })
   .meta({
     title: "Contract",
