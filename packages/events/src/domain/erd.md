@@ -6,18 +6,20 @@ The schemas are generated from Zod definitions and provide a visual representati
 
 ## LetterVariant schema
 
+A Letter Variant describes a letter that can be produced with particular characteristics, and may be scoped to a single clientId and campaignId.
+
 ```mermaid
 erDiagram
-    A Letter Variant describes a letter that can be produced with particular characteristics, and may be scoped to a single clientId and campaignId. {
+    LetterVariant {
         string id
         string name
         string description
         string type "enum: STANDARD, BRAILLE, AUDIO, SAME_DAY"
         string status "enum: DRAFT, PUBLISHED, DISABLED"
-        string contractId
+        string contractId "ref: Contract"
         string clientId
         string[] campaignIds
-        string[] packSpecificationIds
+        string[] packSpecificationIds "ref: PackSpecification"
         Constraints constraints
     }
     Constraints {
@@ -26,14 +28,18 @@ erDiagram
         number blackCoveragePercentage
         number colourCoveragePercentage
     }
-    A Letter Variant describes a letter that can be produced with particular characteristics, and may be scoped to a single clientId and campaignId. ||--o{ Constraints : "constraints"
+    LetterVariant }o--|| Contract : "contractId"
+    LetterVariant }o--o{ PackSpecification : "packSpecificationIds"
+    LetterVariant ||--o{ Constraints : "constraints"
 ```
 
 ## PackSpecification schema
 
+A PackSpecification defines the composition, postage and assembly attributes for producing a pack.
+
 ```mermaid
 erDiagram
-    A PackSpecification defines the composition, postage and assembly attributes for producing a pack. {
+    PackSpecification {
         string id
         string name
         string status "enum: DRAFT, PUBLISHED, DISABLED"
@@ -59,10 +65,10 @@ erDiagram
         number maxThickness
     }
     Assembly {
-        string envelopeId
+        string envelopeId "ref: Envelope"
         string printColour "enum: BLACK, COLOUR"
         Paper paper
-        string[] insertIds
+        string[] insertIds "ref: Insert"
         string[] features "enum: MAILMARK, BRAILLE, AUDIO, ADMAIL"
         Record additional "&lt;string, string&gt;"
     }
@@ -74,33 +80,61 @@ erDiagram
         string colour "enum: WHITE, COLOURED"
         boolean recycled
     }
-    A PackSpecification defines the composition, postage and assembly attributes for producing a pack. ||--o{ Constraints : "constraints"
-    A PackSpecification defines the composition, postage and assembly attributes for producing a pack. ||--|| Postage : "postage"
-    A PackSpecification defines the composition, postage and assembly attributes for producing a pack. ||--o{ Assembly : "assembly"
+    Envelope {
+        string id
+        string name
+        string size "enum: C5, C4, DL"
+        string[] features "enum: WHITEMAIL, NHS_BRANDING, NHS_BARCODE"
+        string artwork "url"
+    }
+    PackSpecification ||--o{ Constraints : "constraints"
+    PackSpecification ||--|| Postage : "postage"
+    PackSpecification ||--o{ Assembly : "assembly"
+    Assembly }o--o{ Envelope : "envelopeId"
     Assembly ||--o{ Paper : "paper"
 ```
 
 ## SupplierAllocation schema
 
+An individual contract under which suppliers will be allocated capacity.
+
 ```mermaid
 erDiagram
-    A SupplierAllocation defines the proportion of the volume associated with a contract which should be processed using a specific supplier. {
+    Contract {
         string id
-        string contract
-        string supplier
+        string name
+        string description
+        string startDate
+        string endDate
+    }
+    Supplier {
+        string id
+        string name
+        string channelType "enum: NHSAPP, SMS, EMAIL, LETTER"
+    }
+    SupplierAllocation {
+        string id
+        string contract "ref: Contract"
+        string supplier "ref: Supplier"
         number allocationPercentage "positive, max: 100"
         string status "enum: PUBLISHED, REMOVED"
     }
+    SupplierAllocation }o--|| Contract : "contract"
+    SupplierAllocation }o--|| Supplier : "supplier"
 ```
 
 ## SupplierPack schema
 
+Indicates that a supplier is capable of producing a specific pack specification.
+
 ```mermaid
 erDiagram
-    Indicates that a specific supplier is capable of producing a specific pack specification. {
+    SupplierPack {
         string id
-        string packSpecificationId
-        string supplierId
+        string packSpecificationId "ref: PackSpecification"
+        string supplierId "ref: Supplier"
         string status "enum: SUBMITTED, APPROVED, REJECTED, DISABLED"
     }
+    SupplierPack }o--|| PackSpecification : "packSpecificationId"
+    SupplierPack }o--|| Supplier : "supplierId"
 ```

@@ -27,7 +27,8 @@ export const $LetterVariant = ConfigBase("LetterVariant")
   })
   .meta({
     title: "LetterVariant",
-    description: `A Letter Variant describes a letter that can be produced with particular characteristics, and may be scoped to a single clientId and campaignId.`,
+    description:
+      "A Letter Variant describes a letter that can be produced with particular characteristics, and may be scoped to a single clientId and campaignId.",
   });
 export type LetterVariant = z.infer<typeof $LetterVariant>;
 export const LetterVariantId = $LetterVariant.shape.id.parse;

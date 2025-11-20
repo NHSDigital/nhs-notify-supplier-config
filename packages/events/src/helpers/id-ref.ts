@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { getEntityName } from "zod-mermaid";
 
 /**
  * Creates a field that references another entity by ID, inferring the type from the referenced
@@ -50,12 +51,14 @@ export function idRef<
   }
 
   // Use the provided entity name or the schema description
-  const targetEntityName = entityName || schema.description || "Unknown";
+  const targetEntityName =
+    entityName || getEntityName(schema, z.globalRegistry) || "Entity";
 
   // Create a new schema with the same type and validation as the ID field
   const resultSchema = idFieldSchema.clone().meta({
     title: `${targetEntityName} ID Reference`,
     description: `Reference to a ${targetEntityName} by its unique identifier`,
+    targetEntityName,
   });
 
   return resultSchema as T["shape"][K];
