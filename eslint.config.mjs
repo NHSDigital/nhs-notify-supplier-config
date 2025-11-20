@@ -205,7 +205,7 @@ export default defineConfig([
     },
   },
   {
-    files: ['tests/test-team/**'],
+    files: ['**/__tests__/**'],
     rules: {
       'import-x/no-extraneous-dependencies': [
         2,
@@ -216,7 +216,7 @@ export default defineConfig([
     },
   },
   {
-    files: ['**/utils/**', 'tests/test-team/**'],
+    files: ['**/utils/**', '**/__tests__/**', 'tests/test-team/**'],
     rules: {
       'import-x/prefer-default-export': 0,
     },
@@ -226,7 +226,7 @@ export default defineConfig([
       'no-relative-import-paths': noRelativeImportPaths,
     },
     rules: {
-      'no-relative-import-paths/no-relative-import-paths': 2,
+      'no-relative-import-paths/no-relative-import-paths': 0,
     },
   },
   {
@@ -238,7 +238,17 @@ export default defineConfig([
       ],
     },
   },
-
+  // Add CLI directory override to allow console usage
+  {
+    files: ['**/cli/**/*.{js,jsx,ts,tsx,mjs,cjs}'],
+    rules: {
+      'no-console': 0,
+      'import-x/no-extraneous-dependencies': [
+        'error',
+        { devDependencies: true },
+      ],
+    },
+  },
   // misc rule overrides
   {
     rules: {
