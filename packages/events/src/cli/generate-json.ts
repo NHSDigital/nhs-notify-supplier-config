@@ -4,6 +4,7 @@ import {
   $Contract,
   $LetterVariant,
   $PackSpecification,
+  $Supplier,
   $SupplierAllocation,
   $SupplierPack,
 } from "../domain";
@@ -23,6 +24,7 @@ import {
   $SupplierPackEvent,
   supplierPackEvents,
 } from "../events/supplier-pack-events";
+import { $SupplierEvent, supplierEvents } from "../events/supplier-events";
 
 /**
  * Generate JSON schema for a single Zod schema and write to file
@@ -45,9 +47,7 @@ function generateJsonSchema(
 /**
  * Generate JSON schemas for domain models
  */
-function generateDomainSchemas(
-  domainModels: Record<string, z.ZodTypeAny>,
-) {
+function generateDomainSchemas(domainModels: Record<string, z.ZodTypeAny>) {
   fs.mkdirSync("schemas/domain", { recursive: true });
   for (const [key, schema] of Object.entries(domainModels)) {
     const outFile = `schemas/domain/${key}.schema.json`;
@@ -58,9 +58,7 @@ function generateDomainSchemas(
 /**
  * Generate JSON schemas for event types
  */
-function generateEventSchemas(
-  eventSchemas: Record<string, z.ZodTypeAny>,
-) {
+function generateEventSchemas(eventSchemas: Record<string, z.ZodTypeAny>) {
   fs.mkdirSync("schemas/events", { recursive: true });
   for (const [key, schema] of Object.entries(eventSchemas)) {
     const outFile = `schemas/events/${key}.schema.json`;
@@ -71,10 +69,7 @@ function generateEventSchemas(
 /**
  * Generate a generic "any" event schema that matches any status for a given event type
  */
-function generateAnyEventSchema(
-  schema: z.ZodTypeAny,
-  eventTypeName: string,
-){
+function generateAnyEventSchema(schema: z.ZodTypeAny, eventTypeName: string) {
   fs.mkdirSync("schemas/events", { recursive: true });
   const outFile = `schemas/events/${eventTypeName}.any.schema.json`;
   generateJsonSchema(schema, outFile, `${eventTypeName}.any`);
@@ -87,6 +82,7 @@ generateDomainSchemas({
   "supplier-pack": $SupplierPack,
   contract: $Contract,
   "supplier-allocation": $SupplierAllocation,
+  supplier: $Supplier,
 });
 
 // Generate event schemas for letter variants
@@ -104,3 +100,7 @@ generateAnyEventSchema($SupplierAllocationEvent, "supplier-allocation");
 // Generate event schemas for supplier packs
 generateEventSchemas(supplierPackEvents);
 generateAnyEventSchema($SupplierPackEvent, "supplier-pack");
+
+// Generate event schemas for suppliers
+generateEventSchemas(supplierEvents);
+generateAnyEventSchema($SupplierEvent, "supplier");

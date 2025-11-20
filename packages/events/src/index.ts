@@ -11,3 +11,4 @@ export * from "./events/event-envelope";
 export * from "./events/pack-specification-events";
 export * from "./events/supplier-allocation-events";
 export * from "./events/supplier-pack-events";
+export * from "./events/supplier-events";

@@ -6,6 +6,12 @@ export const $Supplier = ConfigBase("Supplier")
   .extend({
     name: z.string(),
     channelType: $ChannelType,
+    dailyCapacity: z.number().int(),
+    status: z.enum(["PUBLISHED", "DISABLED"]).meta({
+      title: "SupplierStatus",
+      description:
+        "Indicates whether the supplier is currently available for allocations and pack production.",
+    }),
   })
   .describe("Supplier");
 
