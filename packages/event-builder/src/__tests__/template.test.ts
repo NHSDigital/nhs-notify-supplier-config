@@ -19,7 +19,7 @@ describe("generateTemplateExcel", () => {
     const sheetNames = wb.SheetNames.toSorted();
     expect(sheetNames).toEqual(
       [
-        "Contract",
+        "VolumeGroup",
         "LetterVariant",
         "PackSpecification",
         "Supplier",

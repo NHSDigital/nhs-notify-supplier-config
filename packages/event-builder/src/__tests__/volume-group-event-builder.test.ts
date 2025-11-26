@@ -1,43 +1,43 @@
 import {
-  Contract,
-  ContractId,
+  VolumeGroup,
+  VolumeGroupId,
 } from "@nhsdigital/nhs-notify-event-schemas-supplier-config";
 import {
-  buildContractEvent,
-  buildContractEvents,
-} from "../contract-event-builder";
+  buildVolumeGroupEvent,
+  buildVolumeGroupEvents,
+} from "../volume-group-event-builder";
 import { configFromEnv } from "../config";
 
-describe("contract-event-builder", () => {
-  const baseContract: Contract = {
-    id: ContractId("contract-1"),
-    name: "Contract 1",
+describe("volume-group-event-builder", () => {
+  const baseVolumeGroup: VolumeGroup = {
+    id: VolumeGroupId("volume-group-1"),
+    name: "Volume Group 1",
     startDate: "2025-01-01", // date only per schema
     status: "PUBLISHED",
   };
-  const secondContract: Contract = {
-    id: ContractId("contract-2"),
-    name: "Contract 2",
+  const secondVolumeGroup: VolumeGroup = {
+    id: VolumeGroupId("volume-group-2"),
+    name: "Volume Group 2",
     startDate: "2025-01-02", // date only
     status: "PUBLISHED",
   };
-  const draftContract: Contract = {
-    id: ContractId("contract-draft"),
-    name: "Contract Draft",
+  const draftVolumeGroup: VolumeGroup = {
+    id: VolumeGroupId("volume-group-draft"),
+    name: "Volume Group Draft",
     startDate: "2025-01-03", // date only
     status: "DRAFT",
   };
-  const disabledContract: Contract = {
-    id: ContractId("contract-disabled"),
-    name: "Contract Disabled",
+  const disabledVolumeGroup: VolumeGroup = {
+    id: VolumeGroupId("volume-group-disabled"),
+    name: "Volume Group Disabled",
     startDate: "2025-02-01",
     status: "DISABLED",
   };
 
   it("builds event with explicit sequence string and severity ERROR", () => {
     const cfg = configFromEnv();
-    const event = buildContractEvent(
-      baseContract,
+    const event = buildVolumeGroupEvent(
+      baseVolumeGroup,
       {
         severity: "ERROR",
         sequence: "00000000000000000042",
@@ -48,15 +48,15 @@ describe("contract-event-builder", () => {
     expect(event!.sequence).toBe("00000000000000000042");
     expect(event!.severitytext).toBe("ERROR");
     expect(event!.severitynumber).toBe(4);
-    expect(event!.subject).toBe("contract/contract-1");
+    expect(event!.subject).toBe("volume-group/volume-group-1");
     expect(event!.type).toBe(
-      "uk.nhs.notify.supplier-config.contract.published.v1",
+      "uk.nhs.notify.supplier-config.volume-group.published.v1",
     );
   });
 
   it("builds events using generator sequence path (object branch)", () => {
-    const events = buildContractEvents(
-      { c1: baseContract, c2: secondContract },
+    const events = buildVolumeGroupEvents(
+      { vg1: baseVolumeGroup, vg2: secondVolumeGroup },
       10,
     );
     expect(events).toHaveLength(2);
@@ -68,9 +68,9 @@ describe("contract-event-builder", () => {
   });
 
   it("builds events using generator sequence and default startingCounter", () => {
-    const events = buildContractEvents({
-      c1: baseContract,
-      c2: secondContract,
+    const events = buildVolumeGroupEvents({
+      vg1: baseVolumeGroup,
+      vg2: secondVolumeGroup,
     });
     expect(events).toHaveLength(2);
     expect(events[0]!.sequence).toBe("00000000000000000001");
@@ -81,7 +81,7 @@ describe("contract-event-builder", () => {
   });
 
   it("builds event without sequence (undefined branch) and severity WARN", () => {
-    const event = buildContractEvent(baseContract, { severity: "WARN" });
+    const event = buildVolumeGroupEvent(baseVolumeGroup, { severity: "WARN" });
     expect(event).toBeDefined();
     expect(event!.sequence).toBeUndefined();
     expect(event!.severitytext).toBe("WARN");
@@ -89,60 +89,60 @@ describe("contract-event-builder", () => {
   });
 
   it("applies severity FATAL mapping", () => {
-    const event = buildContractEvent(baseContract, { severity: "FATAL" });
+    const event = buildVolumeGroupEvent(baseVolumeGroup, { severity: "FATAL" });
     expect(event).toBeDefined();
     expect(event!.severitytext).toBe("FATAL");
     expect(event!.severitynumber).toBe(5);
   });
 
-  it("returns undefined for DRAFT contract", () => {
-    const event = buildContractEvent(draftContract);
+  it("returns undefined for DRAFT volume group", () => {
+    const event = buildVolumeGroupEvent(draftVolumeGroup);
     expect(event).toBeUndefined();
   });
 
-  it("buildContractEvents includes undefined for DRAFT contract", () => {
-    const events = buildContractEvents({
-      published: baseContract,
-      draft: draftContract,
+  it("buildVolumeGroupEvents includes undefined for DRAFT volume group", () => {
+    const events = buildVolumeGroupEvents({
+      published: baseVolumeGroup,
+      draft: draftVolumeGroup,
     });
     expect(events).toHaveLength(2);
     const publishedEvent = events.find(
-      (e) => e && e.subject === "contract/contract-1",
+      (e) => e && e.subject === "volume-group/volume-group-1",
     );
     expect(publishedEvent).toBeDefined();
     const draftEvent = events.find(
-      (e) => e?.subject === "contract/contract-draft",
+      (e) => e?.subject === "volume-group/volume-group-draft",
     );
     expect(draftEvent).toBeUndefined();
     expect(events.filter((e) => e === undefined)).toHaveLength(1);
   });
 
   it("builds event for DISABLED status", () => {
-    const event = buildContractEvent(disabledContract);
+    const event = buildVolumeGroupEvent(disabledVolumeGroup);
     expect(event).toBeDefined();
-    expect(event!.type).toBe("uk.nhs.notify.supplier-config.contract.disabled.v1");
-    expect(event!.subject).toBe("contract/contract-disabled");
-    expect(event!.partitionkey).toBe(disabledContract.id);
+    expect(event!.type).toBe("uk.nhs.notify.supplier-config.volume-group.disabled.v1");
+    expect(event!.subject).toBe("volume-group/volume-group-disabled");
+    expect(event!.partitionkey).toBe(disabledVolumeGroup.id);
   });
 
   it("builds event with TRACE severity", () => {
-    const event = buildContractEvent(baseContract, { severity: "TRACE" });
+    const event = buildVolumeGroupEvent(baseVolumeGroup, { severity: "TRACE" });
     expect(event).toBeDefined();
     expect(event!.severitytext).toBe("TRACE");
     expect(event!.severitynumber).toBe(0);
   });
 
   it("builds event with DEBUG severity", () => {
-    const event = buildContractEvent(baseContract, { severity: "DEBUG" });
+    const event = buildVolumeGroupEvent(baseVolumeGroup, { severity: "DEBUG" });
     expect(event).toBeDefined();
     expect(event!.severitytext).toBe("DEBUG");
     expect(event!.severitynumber).toBe(1);
   });
 
   it("includes partitionkey and valid traceparent format", () => {
-    const event = buildContractEvent(baseContract);
+    const event = buildVolumeGroupEvent(baseVolumeGroup);
     expect(event).toBeDefined();
-    expect(event!.partitionkey).toBe(baseContract.id);
+    expect(event!.partitionkey).toBe(baseVolumeGroup.id);
     expect(event!.traceparent).toMatch(/^00-[0-9a-f]{32}-[0-9a-f]{16}-01$/);
   });
 
@@ -153,19 +153,19 @@ describe("contract-event-builder", () => {
       process.env.EVENT_SERVICE = "custom-service";
       process.env.EVENT_DATASCHEMAVERSION = "1.9.9"; // must start with major '1.' per schema regex
       const cfg = configFromEnv();
-      const event = buildContractEvent(baseContract, {}, cfg);
+      const event = buildVolumeGroupEvent(baseVolumeGroup, {}, cfg);
       expect(event).toBeDefined();
       expect(event!.source).toBe("/control-plane/supplier-config/staging/custom-service");
-      expect(event!.dataschema).toMatch(/contract\.published\.1\.9\.9\.schema\.json$/);
+      expect(event!.dataschema).toMatch(/volume-group\.published\.1\.9\.9\.schema\.json$/);
     } finally {
       process.env = originalEnv; // restore
     }
   });
 
   it("throws error when specialised schema missing (unknown status)", () => {
-    // Force an invalid status not in contractEvents map
-    const bogus = { ...baseContract, status: "ARCHIVED" as any };
-    expect(() => buildContractEvent(bogus as Contract)).toThrow(
+    // Force an invalid status not in volumeGroupEvents map
+    const bogus = { ...baseVolumeGroup, status: "ARCHIVED" as any };
+    expect(() => buildVolumeGroupEvent(bogus as VolumeGroup)).toThrow(
       /No specialised event schema found for status ARCHIVED/,
     );
   });

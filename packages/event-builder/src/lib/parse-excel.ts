@@ -14,10 +14,10 @@ import {
   LetterVariantId,
 } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/letter-variant";
 import {
-  $Contract,
-  Contract,
-  ContractId,
-} from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/contract";
+  $VolumeGroup,
+  VolumeGroup,
+  VolumeGroupId,
+} from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/volume-group";
 import {
   $Supplier,
   Supplier,
@@ -69,7 +69,7 @@ interface LetterVariantRow {
   id: string;
   name: string;
   description?: string;
-  contractId: string;
+  volumeGroupId: string;
   packSpecificationIds: string;
   type: string;
   status: string;
@@ -82,7 +82,7 @@ interface LetterVariantRow {
   "constraints.colourCoveragePercentage"?: string;
 }
 
-interface ContractRow {
+interface VolumeGroupRow {
   id: string;
   name: string;
   description?: string;
@@ -95,11 +95,13 @@ interface SupplierRow {
   id: string;
   name: string;
   channelType: string;
+  dailyCapacity: string;
+  status?: string;
 }
 
 interface SupplierAllocationRow {
   id: string;
-  contract: string;
+  volumeGroupId: string;
   supplier: string;
   allocationPercentage: string;
   status: string;
@@ -294,7 +296,7 @@ function parseLetterVariant(row: LetterVariantRow): LetterVariant {
     id: LetterVariantId(row.id),
     name: row.name,
     description: row.description || row.name,
-    contractId: row.contractId as LetterVariant["contractId"],
+    volumeGroupId: row.volumeGroupId as LetterVariant["volumeGroupId"],
     type: row.type as LetterVariant["type"],
     status: row.status as LetterVariant["status"],
     packSpecificationIds: baseIds.map((id) => PackSpecificationId(id)),
@@ -317,21 +319,21 @@ function parseLetterVariant(row: LetterVariantRow): LetterVariant {
   return parsed.data;
 }
 
-function parseContract(row: ContractRow): Contract {
-  const draft: Partial<Contract> = {
-    id: ContractId(row.id),
+function parseVolumeGroup(row: VolumeGroupRow): VolumeGroup {
+  const draft: Partial<VolumeGroup> = {
+    id: VolumeGroupId(row.id),
     name: row.name,
     startDate: parseDateOnly(row.startDate),
-    status: (row.status || "PUBLISHED") as Contract["status"],
+    status: (row.status || "PUBLISHED") as VolumeGroup["status"],
   };
 
   if (row.description) draft.description = row.description;
   if (row.endDate) draft.endDate = parseDateOnly(row.endDate);
 
-  const parsed = $Contract.safeParse(draft);
+  const parsed = $VolumeGroup.safeParse(draft);
   if (!parsed.success) {
     throw new Error(
-      `Validation failed for Contract '${row.id}': ${JSON.stringify(
+      `Validation failed for VolumeGroup '${row.id}': ${JSON.stringify(
         parsed.error.issues,
       )}`,
     );
@@ -344,6 +346,8 @@ function parseSupplier(row: SupplierRow): Supplier {
     id: SupplierId(row.id),
     name: row.name,
     channelType: row.channelType as Supplier["channelType"],
+    dailyCapacity: Number.parseInt(row.dailyCapacity, 10),
+    status: (row.status || "PUBLISHED") as Supplier["status"],
   };
 
   const parsed = $Supplier.safeParse(draft);
@@ -362,7 +366,7 @@ function parseSupplierAllocation(
 ): SupplierAllocation {
   const draft = {
     id: row.id,
-    contract: ContractId(row.contract),
+    volumeGroup: VolumeGroupId(row.volumeGroupId),
     supplier: SupplierId(row.supplier),
     allocationPercentage: Number.parseFloat(row.allocationPercentage),
     status: row.status as SupplierAllocation["status"],
@@ -401,7 +405,7 @@ function parseSupplierPack(row: SupplierPackRow): SupplierPack {
 export interface ParseResult {
   packs: Record<string, PackSpecification>;
   variants: Record<string, LetterVariant>;
-  contracts: Record<string, Contract>;
+  volumeGroups: Record<string, VolumeGroup>;
   suppliers: Record<string, Supplier>;
   allocations: Record<string, SupplierAllocation>;
   supplierPacks: Record<string, SupplierPack>;
@@ -435,17 +439,19 @@ function buildVariants(
   return variants;
 }
 
-function buildContracts(contractRows: ContractRow[]): Record<string, Contract> {
-  const contracts: Record<string, Contract> = {};
-  for (const row of contractRows) {
-    const contract = parseContract(row);
-    const key = sanitizeId(contract.id);
-    Object.defineProperty(contracts, key, {
-      value: contract,
+function buildVolumeGroups(
+  volumeGroupRows: VolumeGroupRow[],
+): Record<string, VolumeGroup> {
+  const volumeGroups: Record<string, VolumeGroup> = {};
+  for (const row of volumeGroupRows) {
+    const volumeGroup = parseVolumeGroup(row);
+    const key = sanitizeId(volumeGroup.id);
+    Object.defineProperty(volumeGroups, key, {
+      value: volumeGroup,
       enumerable: true,
     });
   }
-  return contracts;
+  return volumeGroups;
 }
 
 function buildSuppliers(supplierRows: SupplierRow[]): Record<string, Supplier> {
@@ -507,10 +513,12 @@ export function parseExcelFile(filePath: string): ParseResult {
     XLSX.utils.sheet_to_json(variantSheet);
   const variants = buildVariants(variantRows);
 
-  const contractSheet = workbook.Sheets.Contract;
-  if (!contractSheet) throw new Error("Contract sheet not found in Excel file");
-  const contractRows: ContractRow[] = XLSX.utils.sheet_to_json(contractSheet);
-  const contracts = buildContracts(contractRows);
+  const volumeGroupSheet = workbook.Sheets.VolumeGroup;
+  if (!volumeGroupSheet)
+    throw new Error("VolumeGroup sheet not found in Excel file");
+  const volumeGroupRows: VolumeGroupRow[] =
+    XLSX.utils.sheet_to_json(volumeGroupSheet);
+  const volumeGroups = buildVolumeGroups(volumeGroupRows);
 
   const supplierSheet = workbook.Sheets.Supplier;
   if (!supplierSheet) throw new Error("Supplier sheet not found in Excel file");
@@ -531,5 +539,12 @@ export function parseExcelFile(filePath: string): ParseResult {
     XLSX.utils.sheet_to_json(supplierPackSheet);
   const supplierPacks = buildSupplierPacks(supplierPackRows);
 
-  return { packs, variants, contracts, suppliers, allocations, supplierPacks };
+  return {
+    packs,
+    variants,
+    volumeGroups,
+    suppliers,
+    allocations,
+    supplierPacks,
+  };
 }

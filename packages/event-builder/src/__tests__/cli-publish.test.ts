@@ -6,7 +6,7 @@ import {
   EventBridgeClient,
   PutEventsCommand,
 } from "@aws-sdk/client-eventbridge";
-import {ContractId, PackSpecificationId} from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src";
+import {VolumeGroupId, PackSpecificationId} from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src";
 import { buildLetterVariantEvents } from "../letter-variant-event-builder";
 
 jest.mock("@aws-sdk/client-eventbridge", () => {
@@ -30,7 +30,7 @@ describe("publish cli behaviour (indirect)", () => {
       id: LetterVariantId(id),
       name: `Variant ${i}`,
       type: "STANDARD",
-      contractId: ContractId("contract-123"),
+      volumeGroupId: VolumeGroupId("volume-group-123"),
       status: i % 2 === 0 ? "PUBLISHED" : "DISABLED",
       packSpecificationIds: [
         PackSpecificationId("00000000-0000-0000-0000-000000000001"),

@@ -56,7 +56,7 @@ function generateTemplateExcel(out: string, force = false): string {
     "id",
     "name",
     "description",
-    "contractId",
+    "volumeGroupId",
     "packSpecificationIds",
     "type",
     "status",
@@ -68,7 +68,7 @@ function generateTemplateExcel(out: string, force = false): string {
     "constraints.colourCoveragePercentage",
   ]);
 
-  addSheet("Contract", [
+  addSheet("VolumeGroup", [
     "id",
     "name",
     "description",
@@ -77,11 +77,17 @@ function generateTemplateExcel(out: string, force = false): string {
     "status",
   ]);
 
-  addSheet("Supplier", ["id", "name", "channelType"]);
+  addSheet("Supplier", [
+    "id",
+    "name",
+    "channelType",
+    "dailyCapacity",
+    "status",
+  ]);
 
   addSheet("SupplierAllocation", [
     "id",
-    "contract",
+    "volumeGroupId",
     "supplier",
     "allocationPercentage",
     "status",

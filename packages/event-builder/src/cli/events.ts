@@ -10,7 +10,7 @@ import {
 import { parseExcelFile } from "event-builder/src/lib/parse-excel";
 import { buildLetterVariantEvents } from "event-builder/src/letter-variant-event-builder";
 import { buildPackSpecificationEvents } from "event-builder/src/pack-specification-event-builder";
-import { buildContractEvents } from "event-builder/src/contract-event-builder";
+import { buildVolumeGroupEvents } from "event-builder/src/volume-group-event-builder";
 import { buildSupplierEvents } from "event-builder/src/supplier-event-builder";
 import { buildSupplierAllocationEvents } from "event-builder/src/supplier-allocation-event-builder";
 import { buildSupplierPackEvents } from "event-builder/src/supplier-pack-event-builder";
@@ -54,7 +54,9 @@ async function handleParse(args: CommonArgs): Promise<void> {
   console.log(JSON.stringify(result, null, 2));
   console.log(`Parsed ${Object.keys(result.packs).length} pack specifications`);
   console.log(`Parsed ${Object.keys(result.variants).length} letter variants`);
-  console.log(`Parsed ${Object.keys(result.contracts).length} contracts`);
+  console.log(
+    `Parsed ${Object.keys(result.volumeGroups).length} volume groups`,
+  );
   console.log(`Parsed ${Object.keys(result.suppliers).length} suppliers`);
   console.log(
     `Parsed ${Object.keys(result.allocations).length} supplier allocations`,
@@ -72,18 +74,24 @@ function chunk<T>(arr: T[], size: number): T[][] {
 
 async function handlePublish(args: PublishArgs): Promise<void> {
   const inputFile = ensureFile(args.file);
-  const { allocations, contracts, packs, supplierPacks, suppliers, variants } =
-    parseExcelFile(inputFile);
+  const {
+    allocations,
+    packs,
+    supplierPacks,
+    suppliers,
+    variants,
+    volumeGroups,
+  } = parseExcelFile(inputFile);
   console.log(`Reading all entities from: ${inputFile}`);
 
-  // Build events in sequence: contracts, suppliers, packs, supplier-packs, variants, allocations
+  // Build events in sequence: volume groups, suppliers, packs, supplier-packs, variants, allocations
   let counter = 1;
 
-  const contractEventsRaw = buildContractEvents(contracts, counter);
-  const contractEvents = contractEventsRaw.filter(
+  const volumeGroupEventsRaw = buildVolumeGroupEvents(volumeGroups, counter);
+  const volumeGroupEvents = volumeGroupEventsRaw.filter(
     (e): e is NonNullable<typeof e> => e !== undefined,
   );
-  counter += contractEventsRaw.length; // maintain sequence spacing including skipped drafts
+  counter += volumeGroupEventsRaw.length; // maintain sequence spacing including skipped drafts
 
   const supplierEvents = buildSupplierEvents(suppliers, counter);
   counter += supplierEvents.length;
@@ -106,7 +114,7 @@ async function handlePublish(args: PublishArgs): Promise<void> {
   );
 
   const events = [
-    ...contractEvents,
+    ...volumeGroupEvents,
     ...supplierEvents,
     ...packEvents,
     ...supplierPackEvents,
@@ -115,7 +123,7 @@ async function handlePublish(args: PublishArgs): Promise<void> {
   ];
 
   console.log(
-    `Built ${contractEvents.length} Contract events, ${supplierEvents.length} Supplier events, ${packEvents.length} PackSpecification events, ${supplierPackEvents.length} SupplierPack events, ${variantEvents.length} LetterVariant events, and ${allocationEvents.length} SupplierAllocation events`,
+    `Built ${volumeGroupEvents.length} VolumeGroup events, ${supplierEvents.length} Supplier events, ${packEvents.length} PackSpecification events, ${supplierPackEvents.length} SupplierPack events, ${variantEvents.length} LetterVariant events, and ${allocationEvents.length} SupplierAllocation events`,
   );
 
   if (args.dryRun) {
@@ -159,7 +167,6 @@ async function handlePublish(args: PublishArgs): Promise<void> {
     `Successfully published ${events.length} events to bus ${args.bus}`,
   );
 }
-
 
 async function handleTemplate(args: TemplateArgs): Promise<void> {
   const output = generateTemplateExcel(args.out, args.force);

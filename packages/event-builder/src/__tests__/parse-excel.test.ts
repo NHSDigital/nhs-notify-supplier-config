@@ -7,7 +7,7 @@ import { parseExcelFile } from "../lib/parse-excel";
 function buildWorkbook(data: {
   packs: any[];
   variants: any[];
-  contracts?: any[];
+  volumeGroups?: any[];
   suppliers?: any[];
   allocations?: any[];
   supplierPacks?: any[];
@@ -19,8 +19,8 @@ function buildWorkbook(data: {
   XLSX.utils.book_append_sheet(wb, variantSheet, "LetterVariant");
 
   // Add required new sheets with defaults if not provided
-  const contractSheet = XLSX.utils.json_to_sheet(data.contracts || []);
-  XLSX.utils.book_append_sheet(wb, contractSheet, "Contract");
+  const volumeGroupSheet = XLSX.utils.json_to_sheet(data.volumeGroups || []);
+  XLSX.utils.book_append_sheet(wb, volumeGroupSheet, "VolumeGroup");
 
   const supplierSheet = XLSX.utils.json_to_sheet(data.suppliers || []);
   XLSX.utils.book_append_sheet(wb, supplierSheet, "Supplier");
@@ -59,8 +59,8 @@ function buildWorkbookOmitting(omit: string): XLSX.WorkBook {
       "LetterVariant",
     );
   }
-  if (omit !== "Contract") {
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet([]), "Contract");
+  if (omit !== "VolumeGroup") {
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet([]), "VolumeGroup");
   }
   if (omit !== "Supplier") {
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet([]), "Supplier");
@@ -118,7 +118,7 @@ describe("parse-excel", () => {
           id: "variant-1",
           name: "Variant 1",
           description: "Variant 1",
-          contractId: "contract-1",
+          volumeGroupId: "volume-group-1",
           packSpecificationIds: "pack-1,pack-2",
           type: "STANDARD",
           status: "PUBLISHED",
@@ -229,7 +229,7 @@ describe("parse-excel", () => {
           id: "variant-with-constraints",
           name: "Variant with Constraints",
           description: "Test variant",
-          contractId: "contract-1",
+          volumeGroupId: "volume-group-1",
           packSpecificationIds: "pack-1",
           type: "STANDARD",
           status: "PUBLISHED",
@@ -611,7 +611,7 @@ describe("parse-excel", () => {
           id: "variant-with-ids",
           name: "Variant with IDs",
           description: "Test variant",
-          contractId: "contract-1",
+          volumeGroupId: "volume-group-1",
           packSpecificationIds: "pack-1",
           type: "STANDARD",
           status: "PUBLISHED",
@@ -648,7 +648,7 @@ describe("parse-excel", () => {
         {
           id: "variant-no-desc",
           name: "My Variant Name",
-          contractId: "contract-1",
+          volumeGroupId: "volume-group-1",
           packSpecificationIds: "pack-1",
           type: "STANDARD",
           status: "PUBLISHED",
@@ -709,7 +709,7 @@ describe("parse-excel", () => {
         {
           id: "variant_with_underscores_456",
           name: "Variant with Underscores",
-          contractId: "contract-1",
+          volumeGroupId: "volume-group-1",
           packSpecificationIds: "pack-with-dashes-123",
           type: "STANDARD",
           status: "PUBLISHED",
@@ -1008,7 +1008,7 @@ describe("parse-excel", () => {
   });
 
   const missingSheetCases: { sheet: string; error: RegExp }[] = [
-    { sheet: "Contract", error: /Contract sheet not found/ },
+    { sheet: "VolumeGroup", error: /VolumeGroup sheet not found/ },
     { sheet: "Supplier", error: /Supplier sheet not found/ },
     {
       sheet: "SupplierAllocation",
@@ -1026,7 +1026,7 @@ describe("parse-excel", () => {
     });
   }
 
-  it("parses Contract with description and endDate", () => {
+  it("parses VolumeGroup with description and endDate", () => {
     const wb = buildWorkbook({
       packs: [
         {
@@ -1044,17 +1044,17 @@ describe("parse-excel", () => {
         {
           id: "variant-x",
           name: "Variant X",
-          contractId: "contract-x",
+          volumeGroupId: "volume-group-x",
           packSpecificationIds: "pack-x",
           type: "STANDARD",
           status: "PUBLISHED",
         },
       ],
-      contracts: [
+      volumeGroups: [
         {
-          id: "contract-x",
-          name: "Contract X",
-          description: "My Contract",
+          id: "volume-group-x",
+          name: "VolumeGroup X",
+          description: "My VolumeGroup",
           startDate: "2025-01-01",
           endDate: "2025-12-31",
           status: "PUBLISHED",
@@ -1066,10 +1066,10 @@ describe("parse-excel", () => {
     });
     const file = writeWorkbook(wb);
     const result = parseExcelFile(file);
-    expect(result.contracts.contractx.description).toBe("My Contract");
-    expect(result.contracts.contractx.endDate).toBe("2025-12-31");
-    expect(result.contracts.contractx.startDate).toBe("2025-01-01");
-    expect(result.contracts.contractx.status).toBe("PUBLISHED");
+    expect(result.volumeGroups.volumegroupx.description).toBe("My VolumeGroup");
+    expect(result.volumeGroups.volumegroupx.endDate).toBe("2025-12-31");
+    expect(result.volumeGroups.volumegroupx.startDate).toBe("2025-01-01");
+    expect(result.volumeGroups.volumegroupx.status).toBe("PUBLISHED");
   });
 
   it("parses Suppliers of all channel types", () => {
@@ -1087,15 +1087,16 @@ describe("parse-excel", () => {
         },
       ],
       variants: [],
-      contracts: [],
+      volumeGroups: [],
       suppliers: [
-        { id: "supplier-app", name: "App Supplier", channelType: "NHSAPP" },
-        { id: "supplier-sms", name: "SMS Supplier", channelType: "SMS" },
-        { id: "supplier-email", name: "Email Supplier", channelType: "EMAIL" },
+        { id: "supplier-app", name: "App Supplier", channelType: "NHSAPP", dailyCapacity: "1000" },
+        { id: "supplier-sms", name: "SMS Supplier", channelType: "SMS", dailyCapacity: "2000" },
+        { id: "supplier-email", name: "Email Supplier", channelType: "EMAIL", dailyCapacity: "3000" },
         {
           id: "supplier-letter",
           name: "Letter Supplier",
           channelType: "LETTER",
+          dailyCapacity: "4000",
         },
       ],
       allocations: [],
@@ -1124,9 +1125,9 @@ describe("parse-excel", () => {
         },
       ],
       variants: [],
-      contracts: [],
+      volumeGroups: [],
       suppliers: [
-        { id: "supplier-bad", name: "Bad Supplier", channelType: "PIGEON" },
+        { id: "supplier-bad", name: "Bad Supplier", channelType: "PIGEON", dailyCapacity: "1000" },
       ],
       allocations: [],
       supplierPacks: [],
@@ -1152,32 +1153,32 @@ describe("parse-excel", () => {
         },
       ],
       variants: [],
-      contracts: [
-        { id: "contract-a", name: "Contract A", startDate: "2025-01-01" },
+      volumeGroups: [
+        { id: "volume-group-a", name: "VolumeGroup A", startDate: "2025-01-01" },
       ],
       suppliers: [
-        { id: "supplier-a", name: "Supplier A", channelType: "LETTER" },
-        { id: "supplier-b", name: "Supplier B", channelType: "LETTER" },
-        { id: "supplier-c", name: "Supplier C", channelType: "LETTER" },
+        { id: "supplier-a", name: "Supplier A", channelType: "LETTER", dailyCapacity: "1000" },
+        { id: "supplier-b", name: "Supplier B", channelType: "LETTER", dailyCapacity: "2000" },
+        { id: "supplier-c", name: "Supplier C", channelType: "LETTER", dailyCapacity: "3000" },
       ],
       allocations: [
         {
           id: "allocation-1%", // sanitized
-          contract: "contract-a",
+          volumeGroupId: "volume-group-a",
           supplier: "supplier-a",
           allocationPercentage: "0",
           status: "PUBLISHED",
         },
         {
           id: "allocation-2%",
-          contract: "contract-a",
+          volumeGroupId: "volume-group-a",
           supplier: "supplier-b",
           allocationPercentage: "75",
           status: "PUBLISHED",
         },
         {
           id: "allocation-3%",
-          contract: "contract-a",
+          volumeGroupId: "volume-group-a",
           supplier: "supplier-c",
           allocationPercentage: "100",
           status: "PUBLISHED",
@@ -1187,7 +1188,7 @@ describe("parse-excel", () => {
     });
     const file = writeWorkbook(wb);
     const result = parseExcelFile(file);
-    expect(result.allocations.allocation1.contract).toBe("contract-a");
+    expect(result.allocations.allocation1.volumeGroup).toBe("volume-group-a");
     expect(result.allocations.allocation2.allocationPercentage).toBe(75);
     expect(result.allocations.allocation3.allocationPercentage).toBe(100);
   });
@@ -1207,10 +1208,10 @@ describe("parse-excel", () => {
         },
       ],
       variants: [],
-      contracts: [
+      volumeGroups: [
         {
-          id: "contract-bounds",
-          name: "Contract Bounds",
+          id: "volume-group-bounds",
+          name: "VolumeGroup Bounds",
           startDate: "2025-01-01",
         },
       ],
@@ -1219,12 +1220,13 @@ describe("parse-excel", () => {
           id: "supplier-bounds",
           name: "Supplier Bounds",
           channelType: "LETTER",
+          dailyCapacity: "1000",
         },
       ],
       allocations: [
         {
           id: "allocation-high",
-          contract: "contract-bounds",
+          volumeGroupId: "volume-group-bounds",
           supplier: "supplier-bounds",
           allocationPercentage: "150",
           status: "PUBLISHED",
@@ -1251,10 +1253,10 @@ describe("parse-excel", () => {
         },
       ],
       variants: [],
-      contracts: [
+      volumeGroups: [
         {
-          id: "contract-bounds2",
-          name: "Contract Bounds 2",
+          id: "volume-group-bounds2",
+          name: "VolumeGroup Bounds 2",
           startDate: "2025-01-01",
         },
       ],
@@ -1263,12 +1265,13 @@ describe("parse-excel", () => {
           id: "supplier-bounds2",
           name: "Supplier Bounds 2",
           channelType: "LETTER",
+          dailyCapacity: "1000",
         },
       ],
       allocations: [
         {
           id: "allocation-low",
-          contract: "contract-bounds2",
+          volumeGroupId: "volume-group-bounds2",
           supplier: "supplier-bounds2",
           allocationPercentage: "-5",
           status: "PUBLISHED",
@@ -1297,9 +1300,9 @@ describe("parse-excel", () => {
         },
       ],
       variants: [],
-      contracts: [],
+      volumeGroups: [],
       suppliers: [
-        { id: "supplier-sp", name: "Supplier SP", channelType: "LETTER" },
+        { id: "supplier-sp", name: "Supplier SP", channelType: "LETTER", dailyCapacity: "1000" },
       ],
       allocations: [],
       supplierPacks: [
@@ -1352,12 +1355,13 @@ describe("parse-excel", () => {
         },
       ],
       variants: [],
-      contracts: [],
+      volumeGroups: [],
       suppliers: [
         {
           id: "supplier-sp-bad",
           name: "Supplier SP Bad",
           channelType: "LETTER",
+          dailyCapacity: "1000",
         },
       ],
       allocations: [],
@@ -1392,14 +1396,14 @@ describe("parse-excel", () => {
         {
           id: "variant-no-constraints",
           name: "Variant No Constraints",
-          contractId: "contract-nc",
+          volumeGroupId: "volume-group-nc",
           packSpecificationIds: "pack-no-constraints",
           type: "STANDARD",
           status: "PUBLISHED",
         },
       ],
-      contracts: [
-        { id: "contract-nc", name: "Contract NC", startDate: "2025-01-01" },
+      volumeGroups: [
+        { id: "volume-group-nc", name: "VolumeGroup NC", startDate: "2025-01-01" },
       ],
     });
     const file = writeWorkbook(wb);
@@ -1436,17 +1440,17 @@ describe("parse-excel", () => {
         {
           id: "variant-space",
           name: "Variant Space",
-          contractId: "contract-space",
+          volumeGroupId: "volume-group-space",
           packSpecificationIds: " pack-space-1 , pack-space-2 ",
           type: "STANDARD",
           status: "PUBLISHED",
           campaignIds: " campaign-1 ,  campaign-2 ",
         },
       ],
-      contracts: [
+      volumeGroups: [
         {
-          id: "contract-space",
-          name: "Contract Space",
+          id: "volume-group-space",
+          name: "VolumeGroup Space",
           startDate: "2025-01-01",
         },
       ],
@@ -1463,7 +1467,7 @@ describe("parse-excel", () => {
     ]);
   });
 
-  it("parses contract and supplier IDs with special chars sanitizing keys", () => {
+  it("parses volume group and supplier IDs with special chars sanitizing keys", () => {
     const wb = buildWorkbook({
       packs: [
         {
@@ -1478,10 +1482,10 @@ describe("parse-excel", () => {
         },
       ],
       variants: [],
-      contracts: [
+      volumeGroups: [
         {
-          id: "contract#sanitize",
-          name: "Contract Sanitize",
+          id: "volume-group#sanitize",
+          name: "VolumeGroup Sanitize",
           startDate: "2025-01-01",
         },
       ],
@@ -1490,6 +1494,7 @@ describe("parse-excel", () => {
           id: "supplier@sanitize",
           name: "Supplier Sanitize",
           channelType: "LETTER",
+          dailyCapacity: "1000",
         },
       ],
       allocations: [],
@@ -1497,38 +1502,38 @@ describe("parse-excel", () => {
     });
     const file = writeWorkbook(wb);
     const result = parseExcelFile(file);
-    expect(result.contracts.contractsanitize.name).toBe("Contract Sanitize");
+    expect(result.volumeGroups.volumegroupsanitize.name).toBe("VolumeGroup Sanitize");
     expect(result.suppliers.suppliersanitize.name).toBe("Supplier Sanitize");
   });
 
-  it("throws validation error for Contract with missing name", () => {
+  it("throws validation error for VolumeGroup with missing name", () => {
     const wb = buildWorkbook({
       packs: [
         {
-          id: "pack-contract-bad",
-          name: "Pack Contract Bad",
+          id: "pack-volume-group-bad",
+          name: "Pack VolumeGroup Bad",
           status: "PUBLISHED",
           version: "1",
           createdAt: "2025-01-01",
           updatedAt: "2025-01-01",
-          "postage.id": "postage-contract-bad",
+          "postage.id": "postage-volume-group-bad",
           "postage.size": "STANDARD",
         },
       ],
       variants: [
         {
-          id: "variant-contract-bad",
-          name: "Variant Contract Bad",
-          contractId: "contract-bad",
-          packSpecificationIds: "pack-contract-bad",
+          id: "variant-volume-group-bad",
+          name: "Variant VolumeGroup Bad",
+          volumeGroupId: "volume-group-bad",
+          packSpecificationIds: "pack-volume-group-bad",
           type: "STANDARD",
           status: "PUBLISHED",
         },
       ],
-      // Contract row intentionally missing 'name' field to trigger validation error
-      contracts: [
+      // VolumeGroup row intentionally missing 'name' field to trigger validation error
+      volumeGroups: [
         {
-          id: "contract-bad",
+          id: "volume-group-bad",
           startDate: "2025-01-01",
         },
       ],
@@ -1538,11 +1543,11 @@ describe("parse-excel", () => {
     });
     const file = writeWorkbook(wb);
     expect(() => parseExcelFile(file)).toThrow(
-      /Validation failed.*contract-bad/,
+      /Validation failed.*volume-group-bad/,
     );
   });
 
-  it("defaults contract startDate when missing or invalid", () => {
+  it("defaults volume group startDate when missing or invalid", () => {
     const wb = buildWorkbook({
       packs: [
         {
@@ -1560,7 +1565,7 @@ describe("parse-excel", () => {
         {
           id: "variant-default-date",
           name: "Variant Default Date",
-          contractId: "contract-missing-date",
+          volumeGroupId: "volume-group-missing-date",
           packSpecificationIds: "pack-default-date",
           type: "STANDARD",
           status: "PUBLISHED",
@@ -1568,24 +1573,24 @@ describe("parse-excel", () => {
         {
           id: "variant-invalid-date",
           name: "Variant Invalid Date",
-          contractId: "contract-invalid-date",
+          volumeGroupId: "volume-group-invalid-date",
           packSpecificationIds: "pack-default-date",
           type: "STANDARD",
           status: "PUBLISHED",
         },
       ],
-      contracts: [
+      volumeGroups: [
         // Missing startDate entirely (will default)
         {
-          id: "contract-missing-date",
-          name: "Contract Missing Date",
+          id: "volume-group-missing-date",
+          name: "VolumeGroup Missing Date",
           // no startDate provided
           status: "PUBLISHED",
         },
         // Invalid startDate string (will default)
         {
-          id: "contract-invalid-date",
-          name: "Contract Invalid Date",
+          id: "volume-group-invalid-date",
+          name: "VolumeGroup Invalid Date",
           startDate: "not-a-valid-date",
           status: "PUBLISHED",
         },
@@ -1593,7 +1598,7 @@ describe("parse-excel", () => {
     });
     const file = writeWorkbook(wb);
     const result = parseExcelFile(file);
-    expect(result.contracts.contractmissingdate.startDate).toBe("2023-01-01");
-    expect(result.contracts.contractinvaliddate.startDate).toBe("2023-01-01");
+    expect(result.volumeGroups.volumegroupmissingdate.startDate).toBe("2023-01-01");
+    expect(result.volumeGroups.volumegroupinvaliddate.startDate).toBe("2023-01-01");
   });
 });

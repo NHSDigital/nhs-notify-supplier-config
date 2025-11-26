@@ -1,5 +1,5 @@
 import {
-  ContractId,
+  VolumeGroupId,
   LetterVariant,
 } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src";
 import {
@@ -12,7 +12,7 @@ describe("letter-variant-event-builder", () => {
   const base: Partial<LetterVariant> = {
     name: "Test Variant",
     description: "Test",
-    contractId: ContractId("contract-123"),
+    volumeGroupId: VolumeGroupId("volume-group-123"),
     type: "STANDARD",
     packSpecificationIds: ["00000000-0000-0000-0000-000000000001" as any],
     clientId: "client-1",
