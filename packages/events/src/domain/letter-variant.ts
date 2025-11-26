@@ -5,7 +5,7 @@ import {
   $PackSpecification,
 } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/pack-specification";
 import { z } from "zod";
-import { $Contract } from "./contract";
+import { $VolumeGroup } from "./volume-group";
 
 export const $LetterType = z.enum(["STANDARD", "BRAILLE", "AUDIO", "SAME_DAY"]);
 
@@ -15,7 +15,7 @@ export const $LetterVariant = ConfigBase("LetterVariant")
     description: z.string().optional(),
     type: $LetterType,
     status: z.enum(["DRAFT", "PUBLISHED", "DISABLED"]),
-    contractId: idRef($Contract),
+    volumeGroupId: idRef($VolumeGroup),
     clientId: z.string().optional(),
     campaignIds: z.array(z.string()).optional(),
     packSpecificationIds: z.array(idRef($PackSpecification)).nonempty(),

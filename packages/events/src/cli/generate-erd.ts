@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { z } from "zod";
 import {
-  $Contract, $Envelope,
+  $VolumeGroup, $Envelope,
   $LetterVariant,
   $PackSpecification, $Supplier,
   $SupplierAllocation,
@@ -25,9 +25,18 @@ The schemas are generated from Zod definitions and provide a visual representati
 );
 
 for (const [name, schema] of Object.entries({
+  AllSchemas: [
+    $LetterVariant,
+    $PackSpecification,
+    $VolumeGroup,
+    $Supplier,
+    $SupplierAllocation,
+    $SupplierPack,
+    $Envelope,
+  ],
   LetterVariant: [$LetterVariant],
   PackSpecification: [$PackSpecification, $Envelope],
-  SupplierAllocation: [$Contract, $Supplier, $SupplierAllocation],
+  SupplierAllocation: [$VolumeGroup, $Supplier, $SupplierAllocation],
   SupplierPack: [$SupplierPack],
 })) {
   const mermaid = generateMermaidDiagram(schema);

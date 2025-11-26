@@ -1,12 +1,12 @@
 import { z } from "zod";
 import { ConfigBase } from "./common";
 import { idRef } from "../helpers/id-ref";
-import { $Contract } from "./contract";
+import { $VolumeGroup } from "./volume-group";
 import { $Supplier } from "./supplier";
 
 export const $SupplierAllocation = ConfigBase("SupplierAllocation")
   .extend({
-    contract: idRef($Contract),
+    volumeGroup: idRef($VolumeGroup),
     supplier: idRef($Supplier),
     allocationPercentage: z.number().min(0).max(100),
     status: z.enum(["PUBLISHED", "REMOVED"]),
@@ -14,6 +14,6 @@ export const $SupplierAllocation = ConfigBase("SupplierAllocation")
   .meta({
     title: "SupplierAllocation",
     description:
-      "A SupplierAllocation defines the proportion of the volume associated with a contract which should be processed using a specific supplier.",
+      "A SupplierAllocation defines the proportion of the volume associated with a volume group which should be processed using a specific supplier.",
   });
 export type SupplierAllocation = z.infer<typeof $SupplierAllocation>;

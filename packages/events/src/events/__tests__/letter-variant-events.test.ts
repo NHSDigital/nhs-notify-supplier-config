@@ -5,7 +5,7 @@ import {
 } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/events/letter-variant-events";
 import { LetterVariantId } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/letter-variant";
 import { PackSpecificationId } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/pack-specification";
-import { ContractId } from "../../domain";
+import { VolumeGroupId } from "../../domain";
 
 describe("LetterVariant Events", () => {
   describe("letter-variant.published event", () => {
@@ -27,7 +27,7 @@ describe("LetterVariant Events", () => {
         id: LetterVariantId("standard-letter-variant"),
         name: "Standard Letter Variant",
         description: "A standard letter variant for general correspondence",
-        contractId: ContractId("supplier-framework-123"),
+        volumeGroupId: VolumeGroupId("supplier-framework-123"),
         type: "STANDARD",
         status: "PUBLISHED",
         packSpecificationIds: [
@@ -70,7 +70,7 @@ describe("LetterVariant Events", () => {
         data: {
           id: LetterVariantId("braille-variant"),
           name: "Braille Letter Variant",
-          contractId: ContractId("supplier-framework-123"),
+          volumeGroupId: VolumeGroupId("supplier-framework-123"),
           type: "BRAILLE",
           status: "PUBLISHED",
           packSpecificationIds: [PackSpecificationId("braille")],
@@ -87,7 +87,7 @@ describe("LetterVariant Events", () => {
         data: {
           id: LetterVariantId("audio-variant"),
           name: "Audio Letter Variant",
-          contractId: ContractId("supplier-framework-123"),
+          volumeGroupId: VolumeGroupId("supplier-framework-123"),
           type: "AUDIO",
           status: "PUBLISHED",
           packSpecificationIds: [PackSpecificationId("audio")],
@@ -104,7 +104,7 @@ describe("LetterVariant Events", () => {
         data: {
           id: LetterVariantId("same-day-variant"),
           name: "Same Day Letter Variant",
-          contractId: ContractId("supplier-framework-123"),
+          volumeGroupId: VolumeGroupId("supplier-framework-123"),
           type: "SAME_DAY",
           status: "PUBLISHED",
           packSpecificationIds: [PackSpecificationId("same-day")],
@@ -232,7 +232,7 @@ describe("LetterVariant Events", () => {
       data: {
         id: LetterVariantId("disabled-letter-variant"),
         name: "Disabled Letter Variant",
-        contractId: ContractId("supplier-framework-123"),
+        volumeGroupId: VolumeGroupId("supplier-framework-123"),
         type: "STANDARD",
         status: "DISABLED",
         packSpecificationIds: [PackSpecificationId("bau-standard-c5")],

@@ -7,7 +7,7 @@ import {
   PackSpecification,
   PackSpecificationId, PostageId,
 } from "@nhsdigital/nhs-notify-event-schemas-supplier-config/src/domain/pack-specification";
-import {ContractId} from "../domain";
+import {VolumeGroupId} from "../domain";
 
 const bauStandardC5: PackSpecification = {
   id: PackSpecificationId("bau-standard-c5"),
@@ -148,7 +148,7 @@ const variants: Record<string, LetterVariant> = {
     id: LetterVariantId("bau-standard"),
     name: "BAU Standard Letter",
     description: "BAU Standard Letter",
-    contractId: ContractId("contract-12345"),
+    volumeGroupId: VolumeGroupId("volume-group-12345"),
     packSpecificationIds: [bauStandardC5.id, bauStandardC4.id],
     type: "STANDARD",
     status: "PUBLISHED",
@@ -161,7 +161,7 @@ const variants: Record<string, LetterVariant> = {
     id: LetterVariantId("braille"),
     name: "Braille Letter",
     description: "Braille Letter",
-    contractId: ContractId("contract-12345"),
+    volumeGroupId: VolumeGroupId("volume-group-12345"),
     packSpecificationIds: [braille.id],
     type: "BRAILLE",
     status: "PUBLISHED",
@@ -174,7 +174,7 @@ const variants: Record<string, LetterVariant> = {
     id: LetterVariantId("audio"),
     name: "Audio Letter",
     description: "Audio Letter",
-    contractId: ContractId("contract-12345"),
+    volumeGroupId: VolumeGroupId("volume-group-12345"),
     packSpecificationIds: [audio.id],
     type: "AUDIO",
     status: "PUBLISHED",
@@ -187,7 +187,7 @@ const variants: Record<string, LetterVariant> = {
     id: LetterVariantId("same-day"),
     name: "Same Day Letter",
     description: "Same Day Letter",
-    contractId: ContractId("contract-12345"),
+    volumeGroupId: VolumeGroupId("volume-group-12345"),
     packSpecificationIds: [sameDay.id],
     type: "SAME_DAY",
     status: "PUBLISHED",
@@ -200,7 +200,7 @@ const variants: Record<string, LetterVariant> = {
     id: LetterVariantId("client1"),
     name: "Client 1 Letter Variant 1",
     description: "Client 1 Letter Variant 1",
-    contractId: ContractId("contract-campaign1"),
+    volumeGroupId: VolumeGroupId("volume-group-campaign1"),
     packSpecificationIds: [clientPack1.id],
     type: "STANDARD",
     status: "PUBLISHED",
