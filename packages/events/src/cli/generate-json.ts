@@ -1,12 +1,12 @@
 import { z } from "zod";
 import * as fs from "node:fs";
 import {
-  $Contract,
   $LetterVariant,
   $PackSpecification,
   $Supplier,
   $SupplierAllocation,
   $SupplierPack,
+  $VolumeGroup,
 } from "../domain";
 import {
   $LetterVariantEvent,
@@ -25,6 +25,10 @@ import {
   supplierPackEvents,
 } from "../events/supplier-pack-events";
 import { $SupplierEvent, supplierEvents } from "../events/supplier-events";
+import {
+  $VolumeGroupEvent,
+  volumeGroupEvents,
+} from "../events/volume-group-events";
 
 /**
  * Generate JSON schema for a single Zod schema and write to file
@@ -80,7 +84,7 @@ generateDomainSchemas({
   "letter-variant": $LetterVariant,
   "pack-specification": $PackSpecification,
   "supplier-pack": $SupplierPack,
-  contract: $Contract,
+  "volume-group": $VolumeGroup,
   "supplier-allocation": $SupplierAllocation,
   supplier: $Supplier,
 });
@@ -104,3 +108,7 @@ generateAnyEventSchema($SupplierPackEvent, "supplier-pack");
 // Generate event schemas for suppliers
 generateEventSchemas(supplierEvents);
 generateAnyEventSchema($SupplierEvent, "supplier");
+
+// Generate event schemas for volume groups
+generateEventSchemas(volumeGroupEvents);
+generateAnyEventSchema($VolumeGroupEvent, "volume-group");
